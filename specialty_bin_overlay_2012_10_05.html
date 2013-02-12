@@ -1,3 +1,13 @@
+<!---- --
+Plan out good practices for deciding where to apply styles. 
+
+- Break down the manipulation of group-selecting. 
+- Redundant objects should be created and manipulated by GROUP selection. 
+
+- Any better uses of innerHTML? 
+- Substitute / Interaction with jquery.js? 
+-- ---->
+
 <html>
 	<head>
 		<script type="text/javascript" src="./d3.v2.js"></script>
@@ -7,7 +17,8 @@
 		<link rel="stylesheet" type="text/css" href="./bin_specialty_style.css" />
 	</head>
 	<body>
-		<div id = "mainspace">
+		<!-- Foundation DIV structure-->
+                <div id = "mainspace">
 			<div id="pop-up">
 				<div id="pop-up-title"></div>
 				<div id="pop-up-content"></div>
@@ -29,10 +40,11 @@
 				<select id = "selection_list_overlay"></select>
 			</div>		
 		</div>
+                <!-------------------------------- -------------------------------->
+
 		<script type="text/javascript">
 			var sel_provider, sel_provider_predict_spcl, sel_provider_listed_spcl;
 			var to_pane_data;
-			var data_store;
 			var compare_pane_indices = [1,2,3];
 			var col_width = 8;					// Width of bars
 			
@@ -60,18 +72,17 @@
 			var x_padding = 50;
 			
 			var svgbox = d3.select("#mainspace")
-						.insert("svg","div#pop-up")
-						.attr("width", svg_w)
-						.attr("height", svg_h);
+   			      .insert("svg","div#pop-up")
+			      .attr("width", svg_w)
+			      .attr("height", svg_h);
 			
 			var x_scale = d3.scale.linear()
-				.domain([0,barchart_x_feature_max])
-				.range([0, 1050 - x_padding]);
-				//.range([0, 1050 - x_padding]);
+			      .domain([0,barchart_x_feature_max])
+			      .range([0, 1050 - x_padding]);
 
 			var y_scale = d3.scale.linear()
-				.domain([0,barchart_y_feature_max])
-				.range([infopane_height, top_plus_chart_h - 100]);
+			      .domain([0,barchart_y_feature_max])
+			      .range([infopane_height, top_plus_chart_h - 100]);
 
 			// Mouse Position Storage //			
 			svgbox.on("mousemove", function() { MousePosition = d3.svg.mouse(this)});			
@@ -88,12 +99,12 @@
 				spcl1_select = this.options[this.selectedIndex].text;
 				console.log(spcl1_select)
 				redraw_bars_1()
-	        });
+	                   });
 			d3.select("#selection_list_overlay").on("change", function () {
 				spcl2_select = this.options[this.selectedIndex].text;
 				console.log(spcl2_select)
 				redraw_bars_2()
-        	});
+                           });
 
 			var master = ["Internal Medicine","Cardiology","Rheumatology","Emergency Medicine","Physical Medicine"],
 				overlay = ["Internal Medicine","Cardiology","Rheumatology","Emergency Medicine","Physical Medicine"],
