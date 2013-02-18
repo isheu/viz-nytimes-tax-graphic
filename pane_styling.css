@@ -38,7 +38,7 @@ body {
 }
 .nytint-timeline-list li {
    clear: left;
-   padding: 7px 0;
+   padding: 3px 0;
    border-bottom: 1px solid #E2E2E2;
    font: 12px/15px Georgia;
 }
