@@ -1,11 +1,19 @@
 <html>
+   <!-- How to make use of the force diagrams -->
+   <!-- Accomplish tonight
+      grid mouse lines that expose the actual x-y values
+      unfurl list
+      refined sliding transition
+   -->
    <head>
+      <link rel="stylesheet" href="../FontAwesome/css/font-awesome.min.css">
       <script type="text/javascript" src="./d3.v2.js"></script>
       <script type="text/javascript" src="./jquery-1.7.2.js"></script>
-      <script type="text/javascript" src="./view_pane_transition_data.js"></script>
+      <script type="text/javascript" src="./pane_sample_data.js"></script>
       <link rel="stylesheet" type="text/css" href="./pane_styling.css" />
    </head>
    <body>
+      <!--
       <div class="nytint-collabContent">
          <div class="nytint-timeline clearfix">
             <h3 class="nytint-timeline-year">2009</h3>
@@ -25,34 +33,149 @@
          </div>
          <div class="clearfix"</div>   
       </div>      
-      
+      -->
+      <div id = "main">
+      </div>
+      <div>
+         <i class = "icon-camera-retro"></i>
+      </div>
+
       <script type="text/javascript">
-         var viewspace_width = 400;
-         var viewspace_height = 250;
+         var viewspace_width = 900;
+         var viewspace_height = 800;
+
+         var y_price_scale = d3.scale.linear()
+            .domain([35000, 60000])
+            .range([25, 350]);
+
+         var date_st = new Date(2008,1,1);
+         var date_end = new Date(2010,12,31);         
+         var x_date_scale = d3.time.scale()
+            .domain([date_st, date_end])
+            .range([0,514])
+            .nice(d3.time.month);
+         var x_minor_tick = x_date_scale.ticks(d3.time.months, 1);
+         var x_major_tick = x_date_scale.ticks(d3.time.months, 6);
+
          d3.selectAll("body").append("div")
             .attr("id", "chk")
             .attr("class", "checkbox")
             .html("hello");
-         
-         d3.selectAll("body").append("div")
-            .attr("id","main");
 
-         d3.select("#main").append("svg")
+         var svg_container = d3.select("#main").append("svg")
             .attr("id", "svg_viewspace")
             .attr("width", viewspace_width)
             .attr("height", viewspace_height);
+         
+         svg_container.on("mousemove", function() { MousePosition = d3.svg.mouse(this)});
 
          d3.select("#svg_viewspace")
             .append("g")
+            .attr("id", "scatter_pane");
+         
+         d3.selectAll("#scatter_pane")
+            .append("rect")
+            .attr("id","in_view")
+            .attr("fill", "#E7E3DB")
+            .attr("x", 150)
+            .attr("y", 100)
+            .attr("height", 400)
+            .attr("width", 550);
+
+         d3.select("g#scatter_pane").append("line")
+            .attr("id", "x_axis")
+            .attr("x1", 150)
+            .attr("y1", 475)
+            .attr("x2", 700)
+            .attr("y2", 475)
+
+         d3.select("g#scatter_pane").selectAll("line#x_minor_tick")
+            .data(x_minor_tick)
+            .enter().append("line")
+            .attr("class", "minor_ticks")
+            .attr("x1", function(d) { return 150 + 18 + x_date_scale(d); } )
+            .attr("y1", 475)
+            .attr("x2", function(d) { return 150 + 18 + x_date_scale(d); } )
+            .attr("y2", 480);
+
+
+
+         d3.select("g#scatter_pane").selectAll("circle")
+            .data(dates_data)
+            .enter().append("circle")
+            .attr("class", "d_price_pt")
+            .attr("cx", function(d) { return x_date_scale(getDate(d.date)) + 150 + 18 + 2; })
+            .attr("cy", function(d) { return 500 - y_price_scale(d.price); })
+            .attr("r", 2);
+            
+         d3.select("g#scatter_pane")
+            .append("g")
+            .attr("id", "cursor_line_to_axis");
+         d3.selectAll("#cursor_line_to_axis")
+            .append("line")
+            .attr("id", "vert_marker");
+         d3.select("#cursor_line_to_axis")
+            .append("rect")
+            .attr("id", "x_label");
+
+         d3.select("#cursor_line_to_axis")
+            .append("text")
+            .attr("id", "x_detail");            
+
+         d3.select("g#scatter_pane")
+            .on("mousemove", function() {
+                  if ((MousePosition[0] > 168) & (MousePosition[0] < 682)) {
+                     update_cursor_line();
+                  }
+                  else { nodisplay_cursor_line();}})
+            .on("mouseout", nodisplay_cursor_line);
+
+         function getDate(d) {
+            return new Date(d);
+         }
+
+         function update_cursor_line() {
+            d3.selectAll("#x_label")
+               .style("display", "inline")
+               .attr("opacity", 1)
+               .attr("rx", 2)
+               .attr("ry", 2)
+               .attr("width", 36)
+               .attr("height", 15)
+               .attr("fill", "#A7C1D8")
+               .attr("x", function() { return MousePosition[0] - 18; })
+               .attr("y", 485);
+
+            d3.selectAll("#vert_marker")
+               .attr("class", "cursor_line")
+               .attr("opacity", 1)               
+               .style("display", "inline")
+               .attr("x1", function() {return MousePosition[0];})
+               .attr("y1", 100)
+               .attr("x2", function() {return MousePosition[0];})
+               .attr("y2", 500);
+
+            d3.selectAll("#x_detail")  
+               .style("display", "inline")
+               .attr("text-anchor", "middle")
+               .attr("x", function() {return MousePosition[0];})
+               .attr("y", 495)
+               .text(function() { return x_date_scale.invert(MousePosition[0] - 150 - 18).toDateString(); } );
+            }
+
+
+         function nodisplay_cursor_line() {
+            d3.selectAll("#x_label")
+               .attr("opacity", 0);
+            d3.selectAll("#vert_marker")
+               .attr("opacity", 0);
+            d3.selectAll("#x_detail")
+               .style("display", "none");
+            }
+
+
       </script>
       
    </body>
 
 </html>
-
-<!-- WSJ Non-D3 Methods ...
-   <div class="pointerholder" style="left: 257.5px; display: block;">
-      <div class="pointerb arrow"></div>
-      <div class="pointer arrow"></div>
-   </div>
--->

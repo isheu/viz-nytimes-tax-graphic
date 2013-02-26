@@ -39,6 +39,25 @@ body text      #333
 body text      #666
 
 
+
+#333 (gray)
+Arial Narrow (white)
+#fff
+#ccc (dark gray)
+border-bottom: 3px
+#d02027 (youarehere red)
+
+PT Sans, Sans Serif
+13px Helvetica, arial, freesans, clean, sans-serif
+Code: Monaco, Menlo, Consolas, "Courier New", monospace
+"FS Joey Web Regular", Helvetica, Arial, Verdana , sans-serif
+"Helvetica Neue", Helvetica, Arial, sans-serif
+
+<header>
+<aside>
+
+
+
 Nice bar blue        #A7C1D8
 
 #F0F4F5

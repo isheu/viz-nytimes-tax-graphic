@@ -19,6 +19,35 @@ body {
    color: #333;
 }
 
+svg#svg_viewspace {
+   shape-rendering: crispEdges;
+}
+
+line#x_axis {
+   stroke: #999;
+   stroke-width: 1px;
+}
+
+line.minor_ticks {
+   stroke: #999;
+   stroke-width: 1px;
+}
+
+line.cursor_line {
+   stroke: #666;
+   stroke-width: 1px;
+   stroke-dasharray: 1;
+}
+
+circle.d_price_pt {
+   fill: #004276;
+   shape-rendering: crispEdges;
+/*
+   stroke: #004276;
+   stroke-width: 2px;
+   */
+
+}
 
 .nytint-timeline {
    width: 700px;
@@ -46,7 +75,7 @@ body {
 .clearfix {
    display: block;
 }
-
+FontAwesome/
 .clearfix::after {
    content: ".";
    display: block;
