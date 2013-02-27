@@ -87,3 +87,37 @@ elements:
    </ul>
 </div>
 </div>
+
+
+      <!--
+      <div class="nytint-collabContent">
+         <div class="nytint-timeline clearfix">
+            <h3 class="nytint-timeline-year">2009</h3>
+            <ul class="nytint-timeline-list" >
+               <li>Hello</li>
+               <li>2</li>
+               <li>3</li>
+               <li>4</li>
+            </ul>
+            <h3 class="nytint-timeline-year">2010  </h3>
+            <ul class="nytint-timeline-list" >
+               <li>Hello</li>
+               <li>2</li>
+               <li>3</li>
+               <li>4</li>
+            </ul>         
+         </div>
+         <div class="clearfix"</div>   
+      </div>      
+      -->
+
+               
+         d3.selectAll("body").append("div")
+            .attr("id", "chk")
+            .attr("class", "checkbox")
+            .html("hello");
+
+      <div>
+         <i class = "icon-camera-retro"></i>
+      </div>
+

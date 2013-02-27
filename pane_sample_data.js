@@ -22,3 +22,22 @@ var dates_data = [
       {"date":"21APR2010", "price":50652},
       {"date":"19AUG2010", "price":51236}
       ];
+
+var by_year_data = [
+      {"year":"2008", "average": "$20,000"},
+      {"year":"2008", "expenses": "$5,000"},
+      {"year":"2008", "profit": "$15,000"},
+      {"year":"2009", "average":"$17,000"},
+      {"year":"2009", "expenses":"$8,000"},
+      {"year":"2009", "profit":"$9,000"},
+      {"year":"2009", "other_notes":"High expense year"},
+      {"year":"2010", "average": "$22,000"},
+      {"year":"2010", "expenses": "$2,000"},
+      {"year":"2010", "profit": "$20,000"}
+      ];
+
+var by_year_data_wide = [
+      {"year":"2008", "average": "$20,000", "expenses": "$5,000", "profit": "$15,000"},
+      {"year":"2009", "average":"$17,000", "expenses":"$8,000", "profit":"$9,000", "other_notes":"High expense year"},
+      {"year":"2010", "average": "$22,000", "expenses": "$2,000", "profit": "$20,000"}
+      ];

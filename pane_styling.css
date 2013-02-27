@@ -1,3 +1,8 @@
+h2.row_group {
+   font-family: PT Sans, sans-serif;
+   font-weight: normal;
+}
+
 li {
    display: list-item;
    text-align: -webkit-match-parent;
@@ -6,12 +11,6 @@ ul, ol {
    list-style: none;
 }
 
-h3 {
-   -webkit-margin-before: 1em;
-   -webkit-margin-after: 1em;
-   -webkit-margin-start: 0px;
-   -webkit-margin-end: 0px;
-}
 body {
    font-size: 10px;
    line-height: 1.5em;
@@ -19,18 +18,28 @@ body {
    color: #333;
 }
 
-svg#svg_viewspace {
+div#main div#list_pane {
+   display: inline;
+}
+div#main {
+   position: absolute;
+   left: 0;
+   height: 500;
+   width: 625;
+}
+div#list_pane {
+   position: absolute;
+   left: 650;
+   top: 50;
+}
+
+.axis line {
+   stroke: #999;
+   stroke-width: 1px;   
+}
+
+svg {
    shape-rendering: crispEdges;
-}
-
-line#x_axis {
-   stroke: #999;
-   stroke-width: 1px;
-}
-
-line.minor_ticks {
-   stroke: #999;
-   stroke-width: 1px;
 }
 
 line.cursor_line {
@@ -42,11 +51,6 @@ line.cursor_line {
 circle.d_price_pt {
    fill: #004276;
    shape-rendering: crispEdges;
-/*
-   stroke: #004276;
-   stroke-width: 2px;
-   */
-
 }
 
 .nytint-timeline {
@@ -75,7 +79,7 @@ circle.d_price_pt {
 .clearfix {
    display: block;
 }
-FontAwesome/
+
 .clearfix::after {
    content: ".";
    display: block;
@@ -106,4 +110,3 @@ FontAwesome/
    top: 0;
    width: 87px;
 }
-

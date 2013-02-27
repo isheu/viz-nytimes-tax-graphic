@@ -1,181 +1,158 @@
 <html>
    <!-- How to make use of the force diagrams -->
    <!-- Accomplish tonight
-      grid mouse lines that expose the actual x-y values
-      unfurl list
+      grid mouse lines that expose the actual x-y values          check
+      unfurl list (from ul li)                                    
       refined sliding transition
+      drag-drops
+      re-usable chart functions (closure)                         
+         time-series csv reader example
+      formatting                                                  check
+      selection brush
+      use built-in re-usable axes, ticks                          check
+      efficient inheritance
+
+      make effective use of transform-translate for groups        check
+      LESS
+      function-izing
+      knowledge of transitions
+
+      color-brewer type utility?
+      Using WebFonts, FontAwesome                                 
+
+      basic, small sort
+      a href = "#" onclick="$j().toggle();
+      <header><footer><aside>
+      <span><li><ul>
+      <pseudo-classes pseudo-elements>
    -->
    <head>
+      <link href='http://fonts.googleapis.com/css?family=PT+Sans|Open+Sans' rel='stylesheet' type='text/css'>   
       <link rel="stylesheet" href="../FontAwesome/css/font-awesome.min.css">
       <script type="text/javascript" src="./d3.v2.js"></script>
       <script type="text/javascript" src="./jquery-1.7.2.js"></script>
       <script type="text/javascript" src="./pane_sample_data.js"></script>
+      <script type="text/javascript" src="./pane_helper.js"></script>
       <link rel="stylesheet" type="text/css" href="./pane_styling.css" />
    </head>
    <body>
-      <!--
-      <div class="nytint-collabContent">
-         <div class="nytint-timeline clearfix">
-            <h3 class="nytint-timeline-year">2009</h3>
-            <ul class="nytint-timeline-list" >
-               <li>Hello</li>
-               <li>2</li>
-               <li>3</li>
-               <li>4</li>
-            </ul>
-            <h3 class="nytint-timeline-year">2010  </h3>
-            <ul class="nytint-timeline-list" >
-               <li>Hello</li>
-               <li>2</li>
-               <li>3</li>
-               <li>4</li>
-            </ul>         
-         </div>
-         <div class="clearfix"</div>   
-      </div>      
-      -->
       <div id = "main">
       </div>
-      <div>
-         <i class = "icon-camera-retro"></i>
-      </div>
-
       <script type="text/javascript">
+         var short_dt_formatter = d3.time.format("%x");
+         var price_formatter = d3.format(">,s");
+         var price_formatter_prefix = d3.formatPrefix("%x");
+
          var viewspace_width = 900;
          var viewspace_height = 800;
 
-         var y_price_scale = d3.scale.linear()
-            .domain([35000, 60000])
-            .range([25, 350]);
+         var y_plotsize = 400;
+         var x_plotsize = 550;
+         var y_plot_displace = 50;
+         var x_plot_displace = 50;
+         var x_padding = 40;
+         var y_padding = 50;
 
-         var date_st = new Date(2008,1,1);
-         var date_end = new Date(2010,12,31);         
+         //   Defining Axes   //
+         var date_st = new Date(2007,10,1);
+         var date_end = new Date(2010,12,31);
          var x_date_scale = d3.time.scale()
             .domain([date_st, date_end])
-            .range([0,514])
-            .nice(d3.time.month);
-         var x_minor_tick = x_date_scale.ticks(d3.time.months, 1);
-         var x_major_tick = x_date_scale.ticks(d3.time.months, 6);
+            .range([0, (x_plotsize - x_padding)]);
+         var y_price_scale = d3.scale.linear()
+            .domain([60000, 35000])
+            .range([0, y_plotsize - y_padding]);
 
-         d3.selectAll("body").append("div")
-            .attr("id", "chk")
-            .attr("class", "checkbox")
-            .html("hello");
+         var xAxis = d3.svg.axis().scale(x_date_scale)
+            .orient("bottom")
+            .ticks(d3.time.months, 6).tickSubdivide(5).tickSize(5,3,0)
+            .tickFormat(d3.time.format("%b %y"));
+         var yAxis = d3.svg.axis().scale(y_price_scale)
+            .orient("left")
+            .ticks(6).tickSubdivide(4).tickSize(5,3,0)
+            .tickFormat(function(d) { return "$" + price_formatter(d); } );
+         /* ***************** */         
 
          var svg_container = d3.select("#main").append("svg")
             .attr("id", "svg_viewspace")
             .attr("width", viewspace_width)
             .attr("height", viewspace_height);
-         
          svg_container.on("mousemove", function() { MousePosition = d3.svg.mouse(this)});
 
+         // Implement and initiate scatterplot view area //
          d3.select("#svg_viewspace")
             .append("g")
             .attr("id", "scatter_pane");
-         
+
          d3.selectAll("#scatter_pane")
             .append("rect")
             .attr("id","in_view")
             .attr("fill", "#E7E3DB")
-            .attr("x", 150)
-            .attr("y", 100)
-            .attr("height", 400)
-            .attr("width", 550);
+            .attr("x", x_plot_displace)
+            .attr("y", y_plot_displace)
+            .attr("height", y_plotsize)
+            .attr("width", x_plotsize);
 
-         d3.select("g#scatter_pane").append("line")
-            .attr("id", "x_axis")
-            .attr("x1", 150)
-            .attr("y1", 475)
-            .attr("x2", 700)
-            .attr("y2", 475)
-
-         d3.select("g#scatter_pane").selectAll("line#x_minor_tick")
-            .data(x_minor_tick)
-            .enter().append("line")
-            .attr("class", "minor_ticks")
-            .attr("x1", function(d) { return 150 + 18 + x_date_scale(d); } )
-            .attr("y1", 475)
-            .attr("x2", function(d) { return 150 + 18 + x_date_scale(d); } )
-            .attr("y2", 480);
-
-
+         d3.select("#svg_viewspace")
+            .append("g").attr("class", "x axis")
+            .append("line").attr("id", "axis")
+            .attr("x1", function() { return 0; })
+            .attr("y1", 0)
+            .attr("x2", function() { return x_plotsize - x_padding; })
+            .attr("y2", 0)
+         d3.select(".x.axis")
+            .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_plot_displace + y_plotsize - y_padding) + ")"})
+            .call(xAxis);
+         d3.select("#svg_viewspace")
+            .append("g").attr("class", "y axis")
+            .append("line").attr("id", "axis")
+            .attr("x1", 0)
+            .attr("y1", 0)
+            .attr("x2", 0)
+            .attr("y2", function() { return y_plotsize - y_padding; })
+         d3.select(".y.axis")
+            .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_plot_displace) + ")"})
+            .call(yAxis);
 
          d3.select("g#scatter_pane").selectAll("circle")
             .data(dates_data)
             .enter().append("circle")
             .attr("class", "d_price_pt")
-            .attr("cx", function(d) { return x_date_scale(getDate(d.date)) + 150 + 18 + 2; })
-            .attr("cy", function(d) { return 500 - y_price_scale(d.price); })
+            .attr("cx", function(d) { return x_date_scale(getDate(d.date)) + x_plot_displace + x_padding; })
+            .attr("cy", function(d) { return y_plotsize + y_plot_displace - y_padding - y_price_scale(d.price); })
             .attr("r", 2);
             
          d3.select("g#scatter_pane")
             .append("g")
             .attr("id", "cursor_line_to_axis");
-         d3.selectAll("#cursor_line_to_axis")
+         d3.select("#cursor_line_to_axis")
             .append("line")
             .attr("id", "vert_marker");
          d3.select("#cursor_line_to_axis")
             .append("rect")
             .attr("id", "x_label");
-
          d3.select("#cursor_line_to_axis")
             .append("text")
-            .attr("id", "x_detail");            
-
+            .attr("id", "x_detail");
+         
          d3.select("g#scatter_pane")
             .on("mousemove", function() {
-                  if ((MousePosition[0] > 168) & (MousePosition[0] < 682)) {
+                  if ((MousePosition[0] > x_plot_displace + x_padding - 1) & (MousePosition[0] < (x_plotsize + x_plot_displace))) {
                      update_cursor_line();
                   }
                   else { nodisplay_cursor_line();}})
             .on("mouseout", nodisplay_cursor_line);
+         // **************************************** //
 
-         function getDate(d) {
-            return new Date(d);
-         }
-
-         function update_cursor_line() {
-            d3.selectAll("#x_label")
-               .style("display", "inline")
-               .attr("opacity", 1)
-               .attr("rx", 2)
-               .attr("ry", 2)
-               .attr("width", 36)
-               .attr("height", 15)
-               .attr("fill", "#A7C1D8")
-               .attr("x", function() { return MousePosition[0] - 18; })
-               .attr("y", 485);
-
-            d3.selectAll("#vert_marker")
-               .attr("class", "cursor_line")
-               .attr("opacity", 1)               
-               .style("display", "inline")
-               .attr("x1", function() {return MousePosition[0];})
-               .attr("y1", 100)
-               .attr("x2", function() {return MousePosition[0];})
-               .attr("y2", 500);
-
-            d3.selectAll("#x_detail")  
-               .style("display", "inline")
-               .attr("text-anchor", "middle")
-               .attr("x", function() {return MousePosition[0];})
-               .attr("y", 495)
-               .text(function() { return x_date_scale.invert(MousePosition[0] - 150 - 18).toDateString(); } );
-            }
-
-
-         function nodisplay_cursor_line() {
-            d3.selectAll("#x_label")
-               .attr("opacity", 0);
-            d3.selectAll("#vert_marker")
-               .attr("opacity", 0);
-            d3.selectAll("#x_detail")
-               .style("display", "none");
-            }
-
-
+         d3.select("body").append("div")
+            .attr("id", "list_pane");
+         d3.select("div#list_pane").selectAll(".row_group")
+            .data(by_year_data_wide, function(d) { return d.year; })
+            .enter().append("h2")
+            .attr("class","row_group")
+            .attr("id", function(d) { return "row_" + d.year; })
+            .html(function(d) { return d.year; });
       </script>
-      
    </body>
-
 </html>
+
