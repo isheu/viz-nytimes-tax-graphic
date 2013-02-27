@@ -1,6 +1,10 @@
 h2.row_group {
    font-family: PT Sans, sans-serif;
    font-weight: normal;
+   border-bottom: solid; 
+   border-width: 2px;
+   border-color: #d02027;
+   background-color: rgba(128,0,0,0);
 }
 
 li {

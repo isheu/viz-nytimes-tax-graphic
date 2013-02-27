@@ -21,6 +21,7 @@
       Using WebFonts, FontAwesome                                 
 
       basic, small sort
+      re-usable chart to create the provider one.
       a href = "#" onclick="$j().toggle();
       <header><footer><aside>
       <span><li><ul>
@@ -43,6 +44,7 @@
          var price_formatter = d3.format(">,s");
          var price_formatter_prefix = d3.formatPrefix("%x");
 
+
          var viewspace_width = 900;
          var viewspace_height = 800;
 
@@ -56,6 +58,7 @@
          //   Defining Axes   //
          var date_st = new Date(2007,10,1);
          var date_end = new Date(2010,12,31);
+
          var x_date_scale = d3.time.scale()
             .domain([date_st, date_end])
             .range([0, (x_plotsize - x_padding)]);
@@ -65,11 +68,11 @@
 
          var xAxis = d3.svg.axis().scale(x_date_scale)
             .orient("bottom")
-            .ticks(d3.time.months, 6).tickSubdivide(5).tickSize(5,3,0)
+            .ticks(d3.time.months, 6).tickSubdivide(5).tickSize(6,3,0)
             .tickFormat(d3.time.format("%b %y"));
          var yAxis = d3.svg.axis().scale(y_price_scale)
             .orient("left")
-            .ticks(6).tickSubdivide(4).tickSize(5,3,0)
+            .ticks(6).tickSubdivide(4).tickSize(6,3,0)
             .tickFormat(function(d) { return "$" + price_formatter(d); } );
          /* ***************** */         
 
@@ -151,7 +154,17 @@
             .enter().append("h2")
             .attr("class","row_group")
             .attr("id", function(d) { return "row_" + d.year; })
-            .html(function(d) { return d.year; });
+            .html(function(d) { return d.year; })
+            .on("mouseover", colored_transition);
+
+         function colored_transition() {
+            d3.select(this)
+               .style("background-color", "rgba(128,0,0,0.1)")
+               .transition()
+               .duration(500)
+               .style("background-color", "rgba(128,0,0,0)");
+            }
+
       </script>
    </body>
 </html>
