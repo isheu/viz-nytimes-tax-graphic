@@ -8,14 +8,14 @@
       re-usable chart functions (closure)                         
          time-series csv reader example
       formatting                                                  check
-      selection brush
+      selection brush                                             *
       use built-in re-usable axes, ticks                          check
       efficient inheritance
 
       make effective use of transform-translate for groups        check
-      LESS
       function-izing
-      knowledge of transitions
+      knowledge of transitions                                    *
+      LESS
 
       color-brewer type utility?
       Using WebFonts, FontAwesome                                 
@@ -26,7 +26,10 @@
       <header><footer><aside>
       <span><li><ul>
       <pseudo-classes pseudo-elements>
-      Get comfortable with paths.
+      Get comfortable with paths.                                 *
+
+      PERISCOPIC HTML5
+      Look at d3 source code structure.
    -->
    <head>
       <link href='http://fonts.googleapis.com/css?family=PT+Sans|Open+Sans' rel='stylesheet' type='text/css'>   
@@ -138,8 +141,6 @@
             .append("text")
             .attr("id", "x_detail");
          
-
-
          d3.select("g#scatter_pane")
             .on("mousemove", function() {
                   if ((MousePosition[0] > x_plot_displace + x_padding - 1) & (MousePosition[0] < (x_plotsize + x_plot_displace))) {
@@ -147,10 +148,10 @@
                   }
                   else { nodisplay_cursor_line();}})
             .on("mouseout", nodisplay_cursor_line);
-         // **************************************** //
          
          var year_hover_effect = colored_transition()
-                  .base_color("rgba(128,100,0,0.2)");
+            .base_color("rgba(128,100,0,0.2)")
+            .transition_color("rgba(192,100,0,0.5)");
 
          d3.select("body").append("div")
             .attr("id", "list_pane");
@@ -165,4 +166,3 @@
       </script>
    </body>
 </html>
-
