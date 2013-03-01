@@ -21,11 +21,12 @@
       Using WebFonts, FontAwesome                                 
 
       basic, small sort
-      re-usable chart to create the provider one.
+      re-usable chart to create the provider one.                 check-ish
       a href = "#" onclick="$j().toggle();
       <header><footer><aside>
       <span><li><ul>
       <pseudo-classes pseudo-elements>
+      Get comfortable with paths.
    -->
    <head>
       <link href='http://fonts.googleapis.com/css?family=PT+Sans|Open+Sans' rel='stylesheet' type='text/css'>   
@@ -43,7 +44,6 @@
          var short_dt_formatter = d3.time.format("%x");
          var price_formatter = d3.format(">,s");
          var price_formatter_prefix = d3.formatPrefix("%x");
-
 
          var viewspace_width = 900;
          var viewspace_height = 800;
@@ -138,6 +138,8 @@
             .append("text")
             .attr("id", "x_detail");
          
+
+
          d3.select("g#scatter_pane")
             .on("mousemove", function() {
                   if ((MousePosition[0] > x_plot_displace + x_padding - 1) & (MousePosition[0] < (x_plotsize + x_plot_displace))) {
@@ -146,6 +148,9 @@
                   else { nodisplay_cursor_line();}})
             .on("mouseout", nodisplay_cursor_line);
          // **************************************** //
+         
+         var year_hover_effect = colored_transition()
+                  .base_color("rgba(128,100,0,0.2)");
 
          d3.select("body").append("div")
             .attr("id", "list_pane");
@@ -155,15 +160,7 @@
             .attr("class","row_group")
             .attr("id", function(d) { return "row_" + d.year; })
             .html(function(d) { return d.year; })
-            .on("mouseover", colored_transition);
-
-         function colored_transition() {
-            d3.select(this)
-               .style("background-color", "rgba(128,0,0,0.1)")
-               .transition()
-               .duration(500)
-               .style("background-color", "rgba(128,0,0,0)");
-            }
+            .on("mouseover", year_hover_effect);
 
       </script>
    </body>
