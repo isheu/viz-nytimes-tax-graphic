@@ -1,6 +1,7 @@
 function getDate(d) {
    return new Date(d);
 }
+
 function update_cursor_line() {
    d3.select("g#cursor_line_to_axis")
       .style("display", "inline");         
@@ -26,6 +27,7 @@ function update_cursor_line() {
    d3.select("g#cursor_line_to_axis")
       .attr("transform", function() { return "translate(" + MousePosition[0] + "," + (y_plot_displace) + ")";});
    }
+
 function nodisplay_cursor_line() {
    d3.select("g#cursor_line_to_axis")
       .style("display", "none");
@@ -40,7 +42,7 @@ function colored_transition() {
          .transition()
          .duration(250)
          .style("background-color", t_color);
-      }
+   }
    transition.base_color = function(value) {
       b_color = value;
       return transition;
@@ -52,6 +54,20 @@ function colored_transition() {
    return transition;
 }
 
+function colored_underline() {
+   var b_color = "#d02027";
+   function underline(g) {   
+      d3.select(this)
+         .transition()
+         .duration(150)
+         .style("border-color", b_color);
+   }
+   underline.color = function(value) {
+      b_color = value;
+      return underline;
+   }
+   return underline;
+}
 
 // Getter-setter methods, for method-chaining. Modular organization of code.
 function gen_time_xy_plot(metric_X, metric_Y) {
@@ -80,5 +96,15 @@ function gen_time_xy_plot(metric_X, metric_Y) {
          .orient("left")
          .ticks(6).tickSubdivide(4).tickSize(6,3,0)
          .tickFormat(function(d) { return "$" + price_formatter(d); } );
-      }
+      } 
+   draw_time_xy_plot.link_plot = function() {
+   }
+}
+
+// Maybe first write it, then create linking function
+function link_summary_plot(plot_type, variable) {
+}
+
+function gen_heat_map() {
+   // mapping of the values to color
 }

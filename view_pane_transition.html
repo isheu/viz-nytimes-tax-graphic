@@ -2,34 +2,53 @@
    <!-- How to make use of the force diagrams -->
    <!-- Accomplish tonight
       grid mouse lines that expose the actual x-y values          check
-      unfurl list (from ul li)                                    
-      refined sliding transition
-      drag-drops
+      unfurl list (from ul li)                                    ... what is advantage
+      refined sliding transition                                  
+      drag-drops                                                  
       re-usable chart functions (closure)                         
-         time-series csv reader example
+         time-series csv reader example                           
       formatting                                                  check
       selection brush                                             *
       use built-in re-usable axes, ticks                          check
-      efficient inheritance
+      efficient inheritance                                       
 
       make effective use of transform-translate for groups        check
-      function-izing
+      function-izing                                              
       knowledge of transitions                                    *
       LESS
 
-      color-brewer type utility?
+      color-brewer type utility?                                  
       Using WebFonts, FontAwesome                                 
 
-      basic, small sort
+      basic, small sort                                           
       re-usable chart to create the provider one.                 check-ish
-      a href = "#" onclick="$j().toggle();
+      a href = "#" onclick="$j().toggle();                        
       <header><footer><aside>
       <span><li><ul>
       <pseudo-classes pseudo-elements>
       Get comfortable with paths.                                 *
 
+      <thead><tbody>
       PERISCOPIC HTML5
       Look at d3 source code structure.
+      drag-drop panes
+
+      Different Tweens!
+      cursor changes                                              check
+      using positioning to avoid redraw, coordinate calucation    relative? or just straightforward block
+      magnifier, brush
+
+      block vs. inline-block vs. inline vs. relative
+      Avoid SVG when possible. Use cell-padding, cell-spacing, margins, borders
+
+      Create sidebar as group. each element takes an intuitive ID.
+
+      Pleasing tooltip aesthetic
+      heat map - long-wise vertical
+
+      Be prepared to create legends
+      Scrolling, Hiding, Zooming, Switching Windows
+      Ability to re-size
    -->
    <head>
       <link href='http://fonts.googleapis.com/css?family=PT+Sans|Open+Sans' rel='stylesheet' type='text/css'>   
@@ -42,6 +61,34 @@
    </head>
    <body>
       <div id = "main">
+      </div>
+      <div id = "sidebar">                                                                   <!-- Static Options, for now -->
+         <div id = "sidebar_main">
+            <h3 id = "guide"> SELECTION <span class = "icon_recolor"> <i class="icon-chevron-left"> </i> </span></h3>
+            <div id = "main_sidecontent"> 
+               <ul id = "guide_element">Population</ul>              <!-- Can be all javascript-driven, or static -->
+               <li id = "guide_element"> by File Setting</li>            
+               <li id = "guide_element"> by Contractor</li>
+               <li id = "guide_element"> by State</li>
+               <li id = "guide_element"> by Urban / Rural</li>
+               <hr class = "sidebar-section-separator">
+               <ul id = "guide_element">Beneficiary Subgroups</ul>
+               <li id = "guide_element"> by Condition</li>
+               <li id = "guide_element"> by Utilization Level</li>
+               <li id = "guide_element"> by Demographics</li>
+               <hr class = "sidebar-section-separator">
+               <ul id = "guide_element">Provider Subgroups</ul>
+               <li id = "guide_element"> by Specialty</li>
+               <li id = "guide_element"> by Enrollment</li>    
+               <li id = "guide_element"> by Fraud Indicators</li>
+            </div>
+         </div>
+         <div id = "sidebar_options">
+            <h3 id = "guide2"> OPTIONS <span class = "icon_recolor"> <i class="icon-chevron-left"> </i> </span></h3>
+         </div>
+         <div id = "sidebar_configuration">
+            <h3 id = "guide3"> CONFIGURATION <span class = "icon_recolor"> <i class="icon-chevron-left"> </i> </span></h3>
+         </div>
       </div>
       <script type="text/javascript">
          var short_dt_formatter = d3.time.format("%x");
@@ -149,20 +196,37 @@
                   else { nodisplay_cursor_line();}})
             .on("mouseout", nodisplay_cursor_line);
          
-         var year_hover_effect = colored_transition()
-            .base_color("rgba(128,100,0,0.2)")
-            .transition_color("rgba(192,100,0,0.5)");
+         var year_hover_highlight = colored_transition()
+            .base_color("rgba(128,100,0,0.2)");
+         
+         var year_hover_effect = colored_underline();
+         var year_hover_remove_effect = colored_underline()
+            .color("white");
 
          d3.select("body").append("div")
             .attr("id", "list_pane");
          d3.select("div#list_pane").selectAll(".row_group")
             .data(by_year_data_wide, function(d) { return d.year; })
-            .enter().append("h2")
+            .enter().append("ul")
             .attr("class","row_group")
             .attr("id", function(d) { return "row_" + d.year; })
             .html(function(d) { return d.year; })
-            .on("mouseover", year_hover_effect);
+            .on("mouseover", year_hover_effect)
+            .on("mouseout", year_hover_remove_effect);
 
+         // is this most scalable way to do it ... ? 
+         d3.select("h3#guide")
+            .on("click", function() {
+               if (d3.select("div#main_sidecontent").classed("collapsed") == false) {
+                  d3.select("div#main_sidecontent")
+                     .classed("collapsed", true);
+               }
+               else {
+                  d3.select("div#main_sidecontent")
+                     .classed("collapsed", false);                  
+               }
+               console.log("Hi");
+            });
       </script>
    </body>
 </html>
