@@ -39,7 +39,4 @@ var by_year_data_wide = [
       {"year":"2010", "average": "$22,000", "expenses": "$2,000", "profit": "$20,000"}
       ];
 
-
-
-
-      // - / + 
+      // - / + Different colors in heat map

@@ -37,7 +37,7 @@ div#sidebar_options {
    display: block;
    width: 175px;  
 }
-h3#guide {
+h3#selection_section, h3#options_section, h3#config_section {
    font-weight: bold;
    cursor: pointer;
 }

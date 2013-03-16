@@ -108,3 +108,17 @@ function link_summary_plot(plot_type, variable) {
 function gen_heat_map() {
    // mapping of the values to color
 }
+
+function toggle_side_section(div_id) {
+   if (d3.select("div#" + div_id).classed("collapsed") == false) {
+      d3.select("div#" + div_id)
+         .classed("collapsed", true);
+   }
+   else {
+      d3.select("div#" + div_id)
+         .classed("collapsed", false);                  
+   }
+}
+
+function switch_chart_type () {
+}
