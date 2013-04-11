@@ -69,6 +69,8 @@ function colored_underline() {
    return underline;
 }
 
+// Javascript Looping //
+
 // Getter-setter methods, for method-chaining. Modular organization of code.
 function gen_time_xy_plot(metric_X, metric_Y) {
    var width = 550;
@@ -121,4 +123,30 @@ function toggle_side_section(div_id) {
 }
 
 function switch_chart_type () {
+}
+
+// Identifies dragged object type; triggers correct function at dragend.
+function drag_drop() {
+   var drag_object_type = "";
+   var origin_drag_x;
+   var origin_drag_y;
+   
+   var shadow_object = Object.create(d3.select(this));   // "this" will typically be a group/div/cell
+
+   function drag_drop_object(g) {
+      d3.behavior.drag()
+         .origin(this)
+         .on("dragstart", function() {
+             origin_drag_x = MousePosition[0];
+             origin_drag_y = MousePosition[1];         
+             d3.select(this).attr("opacity", 0.6);
+         })
+         .on("drag", function() {
+         
+         })
+         .on("dragend", function() {
+         
+         });
+   }
+   return drag_drop_object;
 }
