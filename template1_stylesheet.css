@@ -5,7 +5,37 @@ Orange, gray
 
 Lucida Grande, Tahoma, Source Sans
 "ff-tisa-web-pro-1","ff-tisa-web-pro-2",serif
-»
-
-
 */
+
+body {
+   font-family: Arial;
+   font-size: 13px;
+}
+
+a {
+   color: #333;
+   text-decoration: none;
+}
+
+a:hover {
+   color: #af2b26;
+}
+
+div.sidebar {
+   font-family: Source Sans, Tahoma, sans-serif;
+   width: 120px;
+   height: 20px;
+   
+}
+
+li.sidebar {
+   list-style: none;
+   padding-left: 6px;
+   line-height: 20px;
+   background: #e6e6e6;   
+}
+
+li.hover {  
+   background: #333;
+   color: #fff;
+}
