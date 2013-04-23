@@ -125,28 +125,48 @@ function toggle_side_section(div_id) {
 function switch_chart_type () {
 }
 
-// Identifies dragged object type; triggers correct function at dragend.
-function drag_drop() {
-   var drag_object_type = "";
-   var origin_drag_x;
-   var origin_drag_y;
-   
-   var shadow_object = Object.create(d3.select(this));   // "this" will typically be a group/div/cell
+var origin_drag_x;
+var origin_drag_y;
+var shadow_object;
+var drag_object_type;
+var drag_drop_object = d3.behavior.drag();
+drag_drop_object
+   .origin(Object)
+   .on("dragstart", function(g) {
+      drag_event_listener();
+      origin_drag_x = event.x;
+      origin_drag_y = event.y;
+      shadow_object = this.cloneNode(true);
+      document.getElementById("shadow_object").appendChild(shadow_object);
+   })
+   .on("drag", function(g) {
+      console.log("dragging");
+      d3.select("#shadow_object")
+         .style("opacity", 0.5)
+         .style("display", "inline")
+         .style("position", "absolute")
+         .style("left", function() {return Window_MousePosition[0] - 15;})
+         .style("top", function() {return Window_MousePosition[1] - 5;});
+   })
+   .on("dragend", function(g) {
+      console.log("drag end");
 
-   function drag_drop_object(g) {
-      d3.behavior.drag()
-         .origin(this)
-         .on("dragstart", function() {
-             origin_drag_x = MousePosition[0];
-             origin_drag_y = MousePosition[1];         
-             d3.select(this).attr("opacity", 0.6);
-         })
-         .on("drag", function() {
-         
-         })
-         .on("dragend", function() {
-         
-         });
+      d3.select("#shadow_object")
+         .transition()
+         .duration(500)
+         .style("left", origin_drag_x)
+         .style("top", origin_drag_y)
+         .style("opacity", 0);
+      d3.select("#shadow_object")
+         .transition()      
+         .delay(500)
+         .style("display", "none");
+      setTimeout(function() {document.getElementById("shadow_object").removeChild(shadow_object);}, 500);
+   });
+
+function drag_event_listener(drag_object, workspace) {
+   function event_listen() {
    }
-   return drag_drop_object;
+   return event_listen
 }
+

@@ -96,9 +96,9 @@
          <div id = "sidebar_configuration">
             <h3 id = "config_section"> CONFIGURATION <span class = "icon_recolor"> <i class="icon-chevron-left"> </i> </span></h3>
             <div id = "config_sidecontent">            
-            </div> 
-            </div>
+            </div></div>
       </div>
+      <div id = "shadow_object"></div>
       <script type="text/javascript">
          var short_dt_formatter = d3.time.format("%x");
          var price_formatter = d3.format(">,s");
@@ -113,6 +113,8 @@
          var x_plot_displace = 50;
          var x_padding = 40;
          var y_padding = 50;
+         var MousePosition = [];
+         var Window_MousePosition = [];
 
          //   Defining Axes   //
          var date_st = new Date(2007,10,1);
@@ -140,6 +142,9 @@
             .attr("width", viewspace_width)
             .attr("height", viewspace_height);
          svg_container.on("mousemove", function() { MousePosition = d3.svg.mouse(this)});
+
+         d3.select("body")
+            .on("mousemove", function() {Window_MousePosition = d3.mouse(this)});
 
          // Implement and initiate scatterplot view area //
          d3.select("#svg_viewspace")
@@ -225,6 +230,9 @@
          d3.select("#selection_section").on("click", function() { return toggle_side_section("main_sidecontent"); });
          d3.select("#options_section").on("click", function() { return toggle_side_section("options_sidecontent"); });
          d3.select("#config_section").on("click", function() { return toggle_side_section("config_sidecontent"); });
+
+         d3.selectAll("#guide_element").call(drag_drop_object);
+
 
       </script>
    </body>
