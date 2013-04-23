@@ -121,8 +121,15 @@ function toggle_side_section(div_id) {
 }
 
 function switch_chart_type () {
+   d3.select("#sidebar_options").newattrib({
+      hello:true
+   });
 }
 
+function workspace() {
+   // A "droppable", in jquery ui terms
+   var accept = [draggable1];
+}
 
 function drag_drop_method() {
    var origin_drag_x;
@@ -133,7 +140,7 @@ function drag_drop_method() {
    drag_drop_object
       .origin(Object)
       .on("dragstart", function(g) {
-         drag_event_listener();
+         /*drag_event_listener(); */
          origin_drag_x = event.x;
          origin_drag_y = event.y;
          shadow_object = this.cloneNode(true);
@@ -141,7 +148,7 @@ function drag_drop_method() {
       })
       .on("drag", function(g) {
          d3.select("#shadow_object")
-            .classed("dragged")
+            /*.classed("dragged") */
             .style("opacity", 0.5)
             .style("display", "inline")
             .style("position", "absolute")
@@ -168,7 +175,7 @@ function drag_drop_method() {
 }
 
 // Can improve this for sure...
-
+/*
 d3.select("body").append("div")
    .attr("id", "workspace_1")
    .append("svg")
@@ -212,10 +219,10 @@ linked_space.custom_event_listener() {     // global
    return event_listener;
 }
 
-/*global event listening object */
+global event listening object 
 function drag_event_listener(drag_object, workspace) {
    function event_listen() {
    }
    return event_listen
 }
-
+*/
