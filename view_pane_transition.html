@@ -231,7 +231,8 @@
          d3.select("#options_section").on("click", function() { return toggle_side_section("options_sidecontent"); });
          d3.select("#config_section").on("click", function() { return toggle_side_section("config_sidecontent"); });
 
-         d3.selectAll("#guide_element").call(drag_drop_object);
+         var drag_drop_object1 = drag_drop_method();
+         d3.selectAll("#guide_element").call(drag_drop_object1);
 
 
       </script>

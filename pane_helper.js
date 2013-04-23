@@ -69,8 +69,6 @@ function colored_underline() {
    return underline;
 }
 
-// Javascript Looping //
-
 // Getter-setter methods, for method-chaining. Modular organization of code.
 function gen_time_xy_plot(metric_X, metric_Y) {
    var width = 550;
@@ -125,45 +123,96 @@ function toggle_side_section(div_id) {
 function switch_chart_type () {
 }
 
-var origin_drag_x;
-var origin_drag_y;
-var shadow_object;
-var drag_object_type;
-var drag_drop_object = d3.behavior.drag();
-drag_drop_object
-   .origin(Object)
-   .on("dragstart", function(g) {
-      drag_event_listener();
-      origin_drag_x = event.x;
-      origin_drag_y = event.y;
-      shadow_object = this.cloneNode(true);
-      document.getElementById("shadow_object").appendChild(shadow_object);
-   })
-   .on("drag", function(g) {
-      console.log("dragging");
-      d3.select("#shadow_object")
-         .style("opacity", 0.5)
-         .style("display", "inline")
-         .style("position", "absolute")
-         .style("left", function() {return Window_MousePosition[0] - 15;})
-         .style("top", function() {return Window_MousePosition[1] - 5;});
-   })
-   .on("dragend", function(g) {
-      console.log("drag end");
 
-      d3.select("#shadow_object")
-         .transition()
-         .duration(500)
-         .style("left", origin_drag_x)
-         .style("top", origin_drag_y)
-         .style("opacity", 0);
-      d3.select("#shadow_object")
-         .transition()      
-         .delay(500)
-         .style("display", "none");
-      setTimeout(function() {document.getElementById("shadow_object").removeChild(shadow_object);}, 500);
-   });
+function drag_drop_method() {
+   var origin_drag_x;
+   var origin_drag_y;
+   var shadow_object;
+   var drag_object_type;
+   var drag_drop_object = d3.behavior.drag();
+   drag_drop_object
+      .origin(Object)
+      .on("dragstart", function(g) {
+         drag_event_listener();
+         origin_drag_x = event.x;
+         origin_drag_y = event.y;
+         shadow_object = this.cloneNode(true);
+         document.getElementById("shadow_object").appendChild(shadow_object);
+      })
+      .on("drag", function(g) {
+         d3.select("#shadow_object")
+            .classed("dragged")
+            .style("opacity", 0.5)
+            .style("display", "inline")
+            .style("position", "absolute")
+            .style("left", function() {return Window_MousePosition[0] - 15;})
+            .style("top", function() {return Window_MousePosition[1] - 5;});
+      })
+      .on("dragend", function(g) {
+         d3.select("#shadow_object")
+            .transition()
+            .duration(500)
+            .style("left", origin_drag_x)
+            .style("top", origin_drag_y)
+            .style("opacity", 0);
+         d3.select("#shadow_object")
+            .transition()      
+            .delay(500)
+            .style("display", "none");
+         setTimeout(function(g) {document.getElementById("shadow_object").removeChild(shadow_object);}, 500);
+      });
+   function drag_drop(g) {
+      this.call(drag_drop_object);
+   }
+   return drag_drop;
+}
 
+// Can improve this for sure...
+
+d3.select("body").append("div")
+   .attr("id", "workspace_1")
+   .append("svg")
+   .attr("id", "workspace_1_svg");
+
+function linked_workspace_drag(wkspace, drag_object) {
+   function linked_space(wkspace, drag_object) {
+      wkspace
+         .on("mousemove", function() {
+               event_listener();
+               check_drag();
+               );
+      
+   }
+   
+   function event_listener() {
+   }
+
+   function check_drag() {
+      drag_object.classed("dragged")
+   }
+   
+   return linked_space;
+}
+
+linked_space.custom_event_listener() {     // global
+   var event_workspaces = [{workspace_1:1},{workspace_2:0}];
+   var event_dragobjects = [{d_object_1:1}];
+
+   function event_listener() {
+   }
+   event_listener.add_workspace(wkspace) {
+      var temp_id = wkspace.attr("id")
+      workspaces_id.push(temp_id);
+   }
+   event_listener.add_dragobject(d_object) {
+      var temp_id = d_object.attr("id")
+      dragobjects_id.push(temp_id);
+   }
+
+   return event_listener;
+}
+
+/*global event listening object */
 function drag_event_listener(drag_object, workspace) {
    function event_listen() {
    }
