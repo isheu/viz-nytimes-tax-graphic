@@ -231,8 +231,16 @@
          d3.select("#options_section").on("click", function() { return toggle_side_section("options_sidecontent"); });
          d3.select("#config_section").on("click", function() { return toggle_side_section("config_sidecontent"); });
 
-         var drag_drop_object1 = drag_drop_method();
-         d3.selectAll("#guide_element").call(drag_drop_object1);
+         var menu_dnd_feature = drag_drop_method();
+         
+         d3.select("#row_2008")
+            .on("mousemove", function() {
+                  console.log(menu_dnd_feature.drop_accepted)
+                  menu_dnd_feature.accept()
+                  menu_dnd_feature.accepted_dest(800,200)
+               });
+
+         d3.selectAll("#guide_element").call(menu_dnd_feature);
 
 
       </script>
