@@ -1,58 +1,4 @@
 <html>
-   <!-- How to make use of the force diagrams -->
-   <!-- Accomplish tonight
-      grid mouse lines that expose the actual x-y values          check
-      unfurl list (from ul li)                                    ... what is advantage
-      refined sliding transition                                  
-      drag-drops                                                  
-      re-usable chart functions (closure)                         
-         time-series csv reader example                           
-      formatting                                                  check
-      selection brush                                             *
-      use built-in re-usable axes, ticks                          check
-      efficient inheritance                                       
-
-      make effective use of transform-translate for groups        check
-      function-izing                                              
-      knowledge of transitions                                    *
-      LESS
-
-      color-brewer type utility?                                  
-      Using WebFonts, FontAwesome                                 
-
-      basic, small sort                                           
-      re-usable chart to create the provider one.                 check-ish
-      a href = "#" onclick="$j().toggle();                        
-      <header><footer><aside>
-      <span><li><ul>
-      <pseudo-classes pseudo-elements>
-      Get comfortable with paths.                                 *
-
-      <thead><tbody>
-      PERISCOPIC HTML5
-      Look at d3 source code structure.
-      drag-drop panes
-
-      Different Tweens!
-      cursor changes                                              check
-      using positioning to avoid redraw, coordinate calucation    relative? or just straightforward block
-      magnifier, brush
-
-      block vs. inline-block vs. inline vs. relative
-      Avoid SVG when possible. Use cell-padding, cell-spacing, margins, borders
-      Create sidebar as group. each element takes an intuitive ID.
-
-      Pleasing tooltip aesthetic
-      heat map - long-wise vertical
-
-      Be prepared to create legends
-      Scrolling, Hiding, Zooming, Switching Windows
-      Ability to re-size
-
-      Search + browse window
-
-      HCPCS-specialty pairing
-   -->
    <head>
       <link href='http://fonts.googleapis.com/css?family=PT+Sans|Open+Sans' rel='stylesheet' type='text/css'>   
       <link rel="stylesheet" href="../FontAwesome/css/font-awesome.min.css">
@@ -63,8 +9,7 @@
       <link rel="stylesheet" type="text/css" href="./pane_styling.css" />
    </head>
    <body>
-      <div id = "main">
-      </div>
+      <div id = "main"></div>
       <div id = "sidebar">                                                                   <!-- Static Options, for now -->
          <div id = "sidebar_main">
             <h3 id = "selection_section"> SELECTION <span class = "icon_recolor"> <i class="icon-chevron-left"> </i> </span></h3>
@@ -98,121 +43,25 @@
             <div id = "config_sidecontent">            
             </div></div>
       </div>
-      <div id = "shadow_object"></div>
+      
       <script type="text/javascript">
          var short_dt_formatter = d3.time.format("%x");
          var price_formatter = d3.format(">,s");
          var price_formatter_prefix = d3.formatPrefix("%x");
 
-         var viewspace_width = 900;
-         var viewspace_height = 800;
-
-         var y_plotsize = 400;
-         var x_plotsize = 550;
-         var y_plot_displace = 50;
-         var x_plot_displace = 50;
-         var x_padding = 40;
-         var y_padding = 50;
          var MousePosition = [];
          var Window_MousePosition = [];
-
-         //   Defining Axes   //
-         var date_st = new Date(2007,10,1);
-         var date_end = new Date(2010,12,31);
-
-         var x_date_scale = d3.time.scale()
-            .domain([date_st, date_end])
-            .range([0, (x_plotsize - x_padding)]);
-         var y_price_scale = d3.scale.linear()
-            .domain([60000, 35000])
-            .range([0, y_plotsize - y_padding]);
-
-         var xAxis = d3.svg.axis().scale(x_date_scale)
-            .orient("bottom")
-            .ticks(d3.time.months, 6).tickSubdivide(5).tickSize(6,3,0)
-            .tickFormat(d3.time.format("%b %y"));
-         var yAxis = d3.svg.axis().scale(y_price_scale)
-            .orient("left")
-            .ticks(6).tickSubdivide(4).tickSize(6,3,0)
-            .tickFormat(function(d) { return "$" + price_formatter(d); } );
-         /* ***************** */         
-
-         var svg_container = d3.select("#main").append("svg")
-            .attr("id", "svg_viewspace")
-            .attr("width", viewspace_width)
-            .attr("height", viewspace_height);
-         svg_container.on("mousemove", function() { MousePosition = d3.svg.mouse(this)});
-
          d3.select("body")
             .on("mousemove", function() {Window_MousePosition = d3.mouse(this)});
 
-         // Implement and initiate scatterplot view area //
-         d3.select("#svg_viewspace")
-            .append("g")
-            .attr("id", "scatter_pane");
+         d3.select("body").append("div").attr("id", "workspace")
+         d3.select("body").append("div").attr("id", "transparent_workspace")
+         d3.select("body").append("div").attr("id", "workspace_2")
+         d3.select("body").append("div").attr("id", "transparent_workspace_2")
+         d3.select("body").append("div").attr("id", "shadow_object")
 
-         d3.selectAll("#scatter_pane")
-            .append("rect")
-            .attr("id","in_view")
-            .attr("fill", "#E7E3DB")
-            .attr("x", x_plot_displace)
-            .attr("y", y_plot_displace)
-            .attr("height", y_plotsize)
-            .attr("width", x_plotsize);
-
-         d3.select("#svg_viewspace")
-            .append("g").attr("class", "x axis")
-            .append("line").attr("id", "axis")
-            .attr("x1", function() { return 0; })
-            .attr("y1", 0)
-            .attr("x2", function() { return x_plotsize - x_padding; })
-            .attr("y2", 0)
-         d3.select(".x.axis")
-            .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_plot_displace + y_plotsize - y_padding) + ")"})
-            .call(xAxis);
-         d3.select("#svg_viewspace")
-            .append("g").attr("class", "y axis")
-            .append("line").attr("id", "axis")
-            .attr("x1", 0)
-            .attr("y1", 0)
-            .attr("x2", 0)
-            .attr("y2", function() { return y_plotsize - y_padding; })
-         d3.select(".y.axis")
-            .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_plot_displace) + ")"})
-            .call(yAxis);
-
-         d3.select("g#scatter_pane").selectAll("circle")
-            .data(dates_data)
-            .enter().append("circle")
-            .attr("class", "d_price_pt")
-            .attr("cx", function(d) { return x_date_scale(getDate(d.date)) + x_plot_displace + x_padding; })
-            .attr("cy", function(d) { return y_plotsize + y_plot_displace - y_padding - y_price_scale(d.price); })
-            .attr("r", 2);
-            
-         d3.select("g#scatter_pane")
-            .append("g")
-            .attr("id", "cursor_line_to_axis");
-         d3.select("#cursor_line_to_axis")
-            .append("line")
-            .attr("id", "vert_marker");
-         d3.select("#cursor_line_to_axis")
-            .append("rect")
-            .attr("id", "x_label");
-         d3.select("#cursor_line_to_axis")
-            .append("text")
-            .attr("id", "x_detail");
-         
-         d3.select("g#scatter_pane")
-            .on("mousemove", function() {
-                  if ((MousePosition[0] > x_plot_displace + x_padding - 1) & (MousePosition[0] < (x_plotsize + x_plot_displace))) {
-                     update_cursor_line();
-                  }
-                  else { nodisplay_cursor_line();}})
-            .on("mouseout", nodisplay_cursor_line);
-         
          var year_hover_highlight = colored_transition()
             .base_color("rgba(128,100,0,0.2)");
-
          var year_hover_effect = colored_underline();
          var year_hover_remove_effect = colored_underline().color("white");
 
@@ -226,22 +75,50 @@
             .html(function(d) { return d.year; })
             .on("mouseover", year_hover_effect)
             .on("mouseout", year_hover_remove_effect);
-
+         
          d3.select("#selection_section").on("click", function() { return toggle_side_section("main_sidecontent"); });
          d3.select("#options_section").on("click", function() { return toggle_side_section("options_sidecontent"); });
          d3.select("#config_section").on("click", function() { return toggle_side_section("config_sidecontent"); });
-
-         var menu_dnd_feature = drag_drop_method();
          
-         d3.select("#row_2008")
-            .on("mousemove", function() {
-                  console.log(menu_dnd_feature.drop_accepted)
-                  menu_dnd_feature.accept()
-                  menu_dnd_feature.accepted_dest(800,200)
-               });
+         var menu_dnd_feature = drag_drop_method();
+         var xy_scatter_plotter = gen_time_xy_plot(dates_data, "workspace", "xy")
+               .set_domain([new Date(2007,10,1), new Date(2010,12,31)], [60000, 35000])
+               .set_width(550)
+               .set_height(450);
 
+         var xy_scatter_plotter_2 = gen_time_xy_plot(dates_data, "workspace_2", "xy_2")
+               .set_domain([new Date(2007,10,1), new Date(2010,12,31)], [60000, 35000])
+               .set_width(550)
+               .set_height(450);
+
+         d3.select("#transparent_workspace")
+            .on("mousemove", function() {
+                  menu_dnd_feature.accept()
+                  menu_dnd_feature.accepted_dest(d3.select(this).style("left"),d3.select(this).style("top"))
+                  menu_dnd_feature.set_triggered_fn(xy_scatter_plotter)
+                  d3.select("#workspace").style("border-style", "solid");
+               })
+            .on("mouseout", function() {
+                  menu_dnd_feature.reject()
+                  d3.select("#workspace").style("border-style", "dotted");
+               });
+         d3.select("#transparent_workspace_2")
+            .on("mousemove", function() {
+                  menu_dnd_feature.accept()
+                  menu_dnd_feature.accepted_dest(d3.select(this).style("left"),d3.select(this).style("top"))
+                  menu_dnd_feature.set_triggered_fn(xy_scatter_plotter_2)
+                  d3.select("#workspace_2").style("border-style", "solid");
+               })
+            .on("mouseout", function() {
+                  menu_dnd_feature.reject()
+                  d3.select("#workspace_2").style("border-style", "dotted");
+               });
+         
          d3.selectAll("#guide_element").call(menu_dnd_feature);
 
+         // Deal with transparent workspace - using z_index?
+         // Button to add workspaces?
+         // Movable, re-sizeable
 
       </script>
    </body>

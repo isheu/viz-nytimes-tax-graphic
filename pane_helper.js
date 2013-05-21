@@ -1,38 +1,84 @@
+/* Basic Functions: 
+***** Holds the SVG canvas. 
+***** Resize-able. 
+*  Advanced Functions: 
+***** Can be initiated as a "droppable", in jqueryUI terms. 
+***** On receipt of "draggable", calls appropriate [drawing / graph-adjust] function. 
+
+No: All workspaces are droppable
+Object is just equal to key:value pair;
+*/
+
 function getDate(d) {
    return new Date(d);
 }
 
-function update_cursor_line() {
-   d3.select("g#cursor_line_to_axis")
-      .style("display", "inline");         
-   d3.selectAll("#x_label")
-      .attr("rx", 2)
-      .attr("ry", 2)
-      .attr("width", 48)
-      .attr("height", 15)
-      .attr("fill", "#A7C1D8")
-      .attr("x", -24)
-      .attr("y", function() { return y_plotsize - 15; });
-   d3.selectAll("#vert_marker")
-      .attr("class", "cursor_line")
-      .attr("x1", 0)
-      .attr("y1", 0)
-      .attr("x2", 0)
-      .attr("y2", function() { return y_plotsize - 15; });
-   d3.selectAll("#x_detail")  
-      .attr("text-anchor", "middle")
-      .attr("x", 0)
-      .attr("y", function() { return y_plotsize - 5; })
-      .text(function() { return short_dt_formatter(x_date_scale.invert(MousePosition[0] - x_plot_displace - x_padding)); } );
-   d3.select("g#cursor_line_to_axis")
-      .attr("transform", function() { return "translate(" + MousePosition[0] + "," + (y_plot_displace) + ")";});
-   }
+function x_axis_detail_ticks(scatter_pane_id, width, x_plot_displace, height, y_plot_displace, x_padding, x_time_scale) {
+   var mouse_xy = [];
+   /* Helper Functions */
+   function update_cursor_line() {
+      d3.select("#" + scatter_pane_id + " #cursor_line_to_axis")
+         .style("display", "inline");
+      d3.selectAll("#" + scatter_pane_id + " #cursor_line_to_axis" + " #x_label")
+         .attr("rx", 2)
+         .attr("ry", 2)
+         .attr("width", 48)
+         .attr("height", 15)
+         .attr("fill", "#A7C1D8")
+         .attr("x", -24)
+         .attr("y", function() { return y_plotsize - 15; });
+      d3.selectAll("#" + scatter_pane_id + " #cursor_line_to_axis" + " #vert_marker")
+         .attr("class", "cursor_line")
+         .attr("x1", 0)
+         .attr("y1", 0)
+         .attr("x2", 0)
+         .attr("y2", function() { return y_plotsize - 15; });
+      d3.selectAll("#" + scatter_pane_id + " #cursor_line_to_axis" + " #x_detail")
+         .attr("text-anchor", "middle")
+         .attr("x", 0)
+         .attr("y", function() { return y_plotsize - 5; })
+         .text(function() { return short_dt_formatter(x_time_scale.invert(mouse_xy[0] - x_plot_displace - x_padding)); } );
+      d3.select("#" + scatter_pane_id + " #cursor_line_to_axis")
+         .attr("transform", function() { return "translate(" + mouse_xy[0] + "," + (y_plot_displace) + ")";});
+      }
 
-function nodisplay_cursor_line() {
-   d3.select("g#cursor_line_to_axis")
-      .style("display", "none");
-   }
+   function nodisplay_cursor_line() {
+      d3.select("#" + scatter_pane_id + " #cursor_line_to_axis")
+         .style("display", "none");
+      }
+   /*****************************************************************/
+   function draw_line_marker() {
+      d3.select("#" + scatter_pane_id)
+         .append("g")
+         .attr("id", "cursor_line_to_axis");
+      d3.select("#" + scatter_pane_id + " #cursor_line_to_axis")
+         .append("line")
+         .attr("id", "vert_marker");
+      d3.select("#" + scatter_pane_id + " #cursor_line_to_axis")
+         .append("rect")
+         .attr("id", "x_label");
+      d3.select("#" + scatter_pane_id + " #cursor_line_to_axis")
+         .append("text")
+         .attr("id", "x_detail");
 
+      d3.select("g#" + scatter_pane_id)
+         .on("mousemove", function() {
+               mouse_xy = d3.svg.mouse(this)
+               if ((mouse_xy[0] > x_plot_displace + x_padding - 1) & (mouse_xy[0] < (width + x_plot_displace))) {
+                  update_cursor_line();
+               }
+               else { 
+                  nodisplay_cursor_line()
+                  ;}
+               })
+         .on("mouseout", nodisplay_cursor_line);
+   }
+   return draw_line_marker
+}
+
+
+// Relative to which origin : browser, DOM element, svg?
+/****************************************************/
 function colored_transition() {
    var b_color = "rgba(128,0,0,0.1)";
    var t_color = "rgba(128,0,0,0)";
@@ -69,64 +115,6 @@ function colored_underline() {
    return underline;
 }
 
-// Getter-setter methods, for method-chaining. Modular organization of code.
-function gen_time_xy_plot(dataset, metric_X, metric_Y) {
-   var width = 550;
-   var height = 450;
-   var date_st = new Date(2006,12,31);
-   var date_end = new Date(2013,1,1);
-   var y_st = 0;
-   var y_end = 15000;
-   
-   var x_domain = [date_st, date_end];
-   var y_domain = [y_st, y_end];   
-   var x_time_scale = d3.time.scale()
-      .domain(x_domain)
-      .range([0, width]);
-   var y_scale = d3.scale.linear()
-      .domain(y_domain)
-      .range([0, height]);
-
-   function update_scale() {
-      x_time_scale = d3.time.scale()
-         .domain(x_domain)
-         .range([0, width]);
-      y_scale = d3.scale.linear()
-         .domain(y_domain)
-         .range([0, height]);         
-   }
-
-   function draw_time_xy_plot() {
-      var x_Axis = d3.svg.axis().scale(x_time_scale)
-         .orient("bottom")
-         .ticks(d3.time.months, 6).tickSubdivide(5).tickSize(6,3,0)
-         .tickFormat(d3.time.format("%b %y"));
-      var y_Axis = d3.svg.axis().scale(y_scale)
-         .orient("left")
-         .ticks(6).tickSubdivide(4).tickSize(6,3,0)
-         .tickFormat(function(d) { return "$" + price_formatter(d); } );
-      } 
-
-   
-   draw_time_xy_plot.set_domain = function(x_domain_array, y_domain_array) {
-      x_domain = x_domain_array;
-      y_domain = y_domain_array;
-      update_scale();
-   }
-   draw_time_xy_plot.set_width = function(w) {
-      width = w;
-      update_scale();
-   }
-   draw_time_xy_plot.set_height = function(h) {
-      height = h;
-      update_scale();
-   }
-
-   draw_time_xy_plot.link_plot = function() {
-   }
-}
-
-
 function toggle_side_section(div_id) {
    if (d3.select("div#" + div_id).classed("collapsed") == false) {
       d3.select("div#" + div_id)
@@ -138,72 +126,145 @@ function toggle_side_section(div_id) {
    }
 }
 
+// Getter-setter methods, for method-chaining. Modular organization of code.
+function gen_time_xy_plot(dataset, wkspace_div_id, plot_id) {
+   var width = 550;
+   var height = 450;
+   var date_st = new Date(2006,12,31);
+   var date_end = new Date(2013,1,1);
+   var y_st = 0;
+   var y_end = 15000;
+   
+   var x_domain = [date_st, date_end];
+   var y_domain = [y_end, y_st];
+   var x_time_scale = d3.time.scale()
+      .domain(x_domain)
+      .range([0, width - x_padding]);
+   var y_scale = d3.scale.linear()
+      .domain(y_domain)
+      .range([0, height - y_padding]);
 
-/* Basic Functions: 
-***** Holds the SVG canvas. 
-***** Resize-able. 
-*  Advanced Functions: 
-***** Can be initiated as a "droppable", in jqueryUI terms. 
-***** On receipt of "draggable", calls appropriate [drawing / graph-adjust] function. 
+   var y_plot_displace = 10;
+   var x_plot_displace = 10;
+   var x_padding = 40;
+   var y_padding = 50;
+   var viewspace_width = width + 25;
+   var viewspace_height = height;
 
-No: All workspaces are droppable
-Object is just equal to key:value pair;
-*/
-function workspace() {
-   var draggables_accepted = [];
-   var draggables_on_hover;
-   var drag_obj_method_array = [];
-   // in this manner: [{"object_id_1": function() {;}},{"object_id_2": function() {;}}];
-   function create_workspace() {
-   }
-   create_workspace.add_draggable = function(draggable) {
-      draggables_accepted.push(draggable.attr("id"));
-      var objectform_of_drag;
-      objectform_of_drag = "{" + draggable.attr("id") + ":" + draggable.attr(method_name) + "}";
-      drag_obj_method_array.push(objectform_of_drag);
-   }
+   var x_detail_tooltip;
 
-   create_workspace.rm_draggable = function(draggable) {
-      draggables_accepted.pop(draggable.attr("id"));
-      drag_obj_method_array.pop(objectform_of_drag);
+   /* Helper Functions - Not accessible by User */
+   function update_scale() {
+      x_time_scale = d3.time.scale()
+         .domain(x_domain)
+         .range([0, width - x_padding]);
+      y_scale = d3.scale.linear()
+         .domain(y_domain)
+         .range([0, height - y_padding]);
+      viewspace_width = width + 25;
+      viewspace_height = height;
+      x_detail_tooltip = x_axis_detail_ticks(plot_id + "_scatter_pane", width, x_plot_displace, height, y_plot_displace, x_padding, x_time_scale)
    }
+   
+   function clear_previous() {
+      wkspace = document.getElementById(wkspace_div_id)
+      while (wkspace.firstChild) {
+          wkspace.removeChild(wkspace.firstChild);
+      }
+   }
+   /**************************************************/
 
-   create_workspace.set_over_fn = function() {
-      this.on("mouseover", function() {
-         draggables_on_hover.push(this.attr("id"));
-      });
-   }
-   create_workspace.set_out_fn = function() {
-      this.on("mouseout", function() {
-         draggables_on_hover.pop(this.attr("id"));
-      });
-   }
+   function draw_time_xy_plot() {
+      clear_previous()
+      var x_axis = d3.svg.axis().scale(x_time_scale)
+         .orient("bottom")
+         .ticks(d3.time.months, 6).tickSubdivide(5).tickSize(6,3,0)
+         .tickFormat(d3.time.format("%b %y"));
+      var y_axis = d3.svg.axis().scale(y_scale)
+         .orient("left")
+         .ticks(6).tickSubdivide(4).tickSize(6,3,0)
+         .tickFormat(function(d) { return "$" + price_formatter(d); } );
+      
+      d3.select("#" + wkspace_div_id).append("svg")
+         .attr("id", function() { return "svg_" + plot_id; })
+         .attr("width", viewspace_width)
+         .attr("height", viewspace_height);
+      
+      d3.select("#svg_" + plot_id)
+         .append("g")
+         .attr("id", function() { return plot_id + "_scatter_pane"; }); 
 
-   create_workspace.get_hovered_draggable = function() {
-      return draggables_on_hover;
-   }
+      d3.selectAll("#" + plot_id + "_scatter_pane")
+         .append("rect")
+         .attr("fill", "#E7E3DB")
+         .attr("x", 0)
+         .attr("y", 0)
+         .attr("height", 500)
+         .attr("width", 600);
 
-   create_workspace.accept_drop = function() {      // Currently hovered object ID
-      var temp = this.get_hovered_draggable()
-      drag_obj_method_array[this.attr("id")]();    // call the proper function when this draggable is accepted!
+      d3.select("#svg_" + plot_id)
+         .append("g").attr("class", "x axis")
+         .append("line").attr("id", "axis")
+         .attr("x1", function() { return 0; })
+         .attr("y1", 0)
+         .attr("x2", function() { return width - x_padding; })
+         .attr("y2", 0)
+      d3.select("#svg_" + plot_id + " .x.axis")
+         .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_plot_displace + height - y_padding) + ")"})
+         .call(x_axis);
+      d3.select("#svg_" + plot_id)
+         .append("g").attr("class", "y axis")
+         .append("line").attr("id", "axis")
+         .attr("x1", 0)
+         .attr("y1", 0)
+         .attr("x2", 0)
+         .attr("y2", function() { return height - y_padding; })
+      d3.select("#svg_" + plot_id + " .y.axis")
+         .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_plot_displace) + ")"})
+         .call(y_axis);
+
+      d3.select("g#" + plot_id + "_scatter_pane").selectAll("circle")
+         .data(dates_data)
+         .enter().append("circle")
+         .attr("class", "d_price_pt")
+         .attr("cx", function(d) { return x_time_scale(getDate(d.date)) + x_plot_displace + x_padding; })
+         .attr("cy", function(d) { return height + y_plot_displace - y_padding - y_scale(d.price); })
+         .attr("r", 2);
+
+      d3.selectAll("#" + plot_id + "_scatter_pane")
+         .call(x_detail_tooltip);
+      } 
+   
+   draw_time_xy_plot.set_domain = function(x_domain_array, y_domain_array) {
+      x_domain = x_domain_array;
+      y_domain = y_domain_array;
+      update_scale();
+      return draw_time_xy_plot;
    }
-   return create_workspace;
+   draw_time_xy_plot.set_width = function(w) {
+      width = w;
+      update_scale();     
+      return draw_time_xy_plot;
+   }
+   draw_time_xy_plot.set_height = function(h) {
+      height = h;
+      update_scale();
+      return draw_time_xy_plot;
+   }
+   return draw_time_xy_plot
 }
-
 
 function drag_drop_method() {
    var origin_drag_x, origin_drag_y, dest_x, dest_y;
    var shadow_object;
-
    var drag_id = "draggable";
-
    triggered_fn = function() {
       alert("Accepted Drop");
    }
 
    var drop_accepted = 0;
    var drag_drop_object = d3.behavior.drag();
-
+   
    drag_drop_object
       .origin(Object)
       .on("dragstart", function(g) {
@@ -253,6 +314,7 @@ function drag_drop_method() {
    function drag_drop(g) { 
       this.call(drag_drop_object); 
    }   
+   drag_drop.status = function() { return drop_accepted; }
    drag_drop.accept = function() { drop_accepted = 1; }
    drag_drop.reject = function() { drop_accepted = 0; }
    drag_drop.accepted_dest = function(x,y) {
@@ -263,7 +325,7 @@ function drag_drop_method() {
       drag_id = id
       return drag_id
    }
-   drag_drop.set_assc_fn = function(fn_triggered) {
+   drag_drop.set_triggered_fn = function(fn_triggered) {
       triggered_fn = fn_triggered
    }
    return drag_drop;
@@ -278,7 +340,6 @@ function add_drag_listener() {
 
 function switch_chart_type () {
    d3.select("#sidebar_options").newattrib({
-      hello:true
    });
 }
 
@@ -290,55 +351,3 @@ function link_summary_plot(plot_type, variable) {
 function gen_heat_map() {
    // mapping of the values to color
 }
-
-// Can improve this for sure...
-/*
-d3.select("body").append("div")
-   .attr("id", "workspace_1")
-   .append("svg")
-   .attr("id", "workspace_1_svg");
-
-function linked_workspace_drag(wkspace, drag_object) {
-   function linked_space(wkspace, drag_object) {
-      wkspace
-         .on("mousemove", function() {
-               event_listener();
-               check_drag();
-               );
-   }
-   
-   function event_listener() {
-   }
-
-   function check_drag() {
-      drag_object.classed("dragged")
-   }
-   
-   return linked_space;
-}
-
-linked_space.custom_event_listener() {     // global
-   var event_workspaces = [{workspace_1:1},{workspace_2:0}];
-   var event_dragobjects = [{d_object_1:1}];
-
-   function event_listener() {
-   }
-   event_listener.add_workspace(wkspace) {
-      var temp_id = wkspace.attr("id")
-      workspaces_id.push(temp_id);
-   }
-   event_listener.add_dragobject(d_object) {
-      var temp_id = d_object.attr("id")
-      dragobjects_id.push(temp_id);
-   }
-
-   return event_listener;
-}
-
-global event listening object 
-function drag_event_listener(drag_object, workspace) {
-   function event_listen() {
-   }
-   return event_listen
-}
-*/

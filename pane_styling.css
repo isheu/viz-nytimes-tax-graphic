@@ -27,18 +27,55 @@ body {
    text-align: start;   
 }
 
-/* Basic Page Layout */
 div#main {
-   display: inline;
-   position: absolute;
-   left: 150;
-   height: 500;
-   width: 625;
 }
+
+div#workspace {
+   position: absolute;
+   left: 200;
+   top: 50;
+   height: 450;
+   width: 575;
+   border-width:1px;
+   border-style: dotted;
+   background-color: #f0f0f0;
+}
+
+div#transparent_workspace {
+   z-index: 1;
+   position: absolute;
+   left: 200;
+   top: 50;
+   height: 450;
+   width: 575;
+   background-color: transparent;
+}
+
+div#workspace_2 {
+   position: absolute;
+   left: 800;
+   top: 500;
+   height: 450;
+   width: 575;
+   border-width:1px;
+   border-style: dotted;
+   background-color: #f0f0f0;
+}
+
+div#transparent_workspace_2 {
+   z-index: 1;
+   position: absolute;
+   left: 800;
+   top: 500;
+   height: 450;
+   width: 575;
+   background-color: transparent;
+}
+
 div#list_pane {
    display: inline;
    position: absolute;
-   left: 755;
+   left: 785;
    top: 50;
 }
 
