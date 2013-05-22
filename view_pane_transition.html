@@ -94,7 +94,7 @@
          d3.select("#transparent_workspace")
             .on("mousemove", function() {
                   menu_dnd_feature.accept()
-                  menu_dnd_feature.accepted_dest(d3.select(this).style("left"),d3.select(this).style("top"))
+                  menu_dnd_feature.accepted_dest(d3.select(this).style("left"),d3.select(this).style("top"),d3.select(this).attr("id"))
                   menu_dnd_feature.set_triggered_fn(xy_scatter_plotter)
                   d3.select("#workspace").style("border-style", "solid");
                })
@@ -102,10 +102,11 @@
                   menu_dnd_feature.reject()
                   d3.select("#workspace").style("border-style", "dotted");
                });
+         
          d3.select("#transparent_workspace_2")
             .on("mousemove", function() {
                   menu_dnd_feature.accept()
-                  menu_dnd_feature.accepted_dest(d3.select(this).style("left"),d3.select(this).style("top"))
+                  menu_dnd_feature.accepted_dest(d3.select(this).style("left"),d3.select(this).style("top"),d3.select(this).attr("id"))
                   menu_dnd_feature.set_triggered_fn(xy_scatter_plotter_2)
                   d3.select("#workspace_2").style("border-style", "solid");
                })

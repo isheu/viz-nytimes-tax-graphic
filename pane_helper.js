@@ -13,7 +13,7 @@ function getDate(d) {
    return new Date(d);
 }
 
-function x_axis_detail_ticks(scatter_pane_id, width, x_plot_displace, height, y_plot_displace, x_padding, x_time_scale) {
+function x_axis_detail_ticks(scatter_pane_id, width, x_plot_displace, height, y_plot_displace, x_padding, y_padding, x_time_scale) {
    var mouse_xy = [];
    /* Helper Functions */
    function update_cursor_line() {
@@ -26,20 +26,20 @@ function x_axis_detail_ticks(scatter_pane_id, width, x_plot_displace, height, y_
          .attr("height", 15)
          .attr("fill", "#A7C1D8")
          .attr("x", -24)
-         .attr("y", function() { return y_plotsize - 15; });
+         .attr("y", function() { return height - 15 - y_plot_displace; });
       d3.selectAll("#" + scatter_pane_id + " #cursor_line_to_axis" + " #vert_marker")
          .attr("class", "cursor_line")
          .attr("x1", 0)
          .attr("y1", 0)
          .attr("x2", 0)
-         .attr("y2", function() { return y_plotsize - 15; });
+         .attr("y2", function() { return height - 15 - y_plot_displace; });
       d3.selectAll("#" + scatter_pane_id + " #cursor_line_to_axis" + " #x_detail")
          .attr("text-anchor", "middle")
          .attr("x", 0)
-         .attr("y", function() { return y_plotsize - 5; })
+         .attr("y", function() { return height - 5 - y_plot_displace; })
          .text(function() { return short_dt_formatter(x_time_scale.invert(mouse_xy[0] - x_plot_displace - x_padding)); } );
       d3.select("#" + scatter_pane_id + " #cursor_line_to_axis")
-         .attr("transform", function() { return "translate(" + mouse_xy[0] + "," + (y_plot_displace) + ")";});
+         .attr("transform", function() { return "translate(" + mouse_xy[0] + "," + y_plot_displace + ")";});
       }
 
    function nodisplay_cursor_line() {
@@ -163,7 +163,7 @@ function gen_time_xy_plot(dataset, wkspace_div_id, plot_id) {
          .range([0, height - y_padding]);
       viewspace_width = width + 25;
       viewspace_height = height;
-      x_detail_tooltip = x_axis_detail_ticks(plot_id + "_scatter_pane", width, x_plot_displace, height, y_plot_displace, x_padding, x_time_scale)
+      x_detail_tooltip = x_axis_detail_ticks(plot_id + "_scatter_pane", width, x_plot_displace, height, y_plot_displace, x_padding, y_padding, x_time_scale)
    }
    
    function clear_previous() {
@@ -258,13 +258,14 @@ function drag_drop_method() {
    var origin_drag_x, origin_drag_y, dest_x, dest_y;
    var shadow_object;
    var drag_id = "draggable";
-   triggered_fn = function() {
-      alert("Accepted Drop");
-   }
-
+   triggered_fn = function() { alert("Accepted Drop"); }
    var drop_accepted = 0;
+   var drop_accepted_ids = [];
    var drag_drop_object = d3.behavior.drag();
    
+   function activate_windows(element, index, array) { d3.select("#" + element).style("z-index", 1); }
+   function deactivate_windows(element, index, array) { d3.select("#" + element).style("z-index", -1); }
+
    drag_drop_object
       .origin(Object)
       .on("dragstart", function(g) {
@@ -272,6 +273,7 @@ function drag_drop_method() {
          origin_drag_y = event.y;
          shadow_object = this.cloneNode(true);
          document.getElementById("shadow_object").appendChild(shadow_object);
+         if (drop_accepted_ids != []) { drop_accepted_ids.forEach(activate_windows); }
       })
       .on("drag", function(g) {
          d3.select("#shadow_object")
@@ -294,7 +296,8 @@ function drag_drop_method() {
                .delay(500)
                .style("display", "none");
             setTimeout(function(g) {document.getElementById("shadow_object").removeChild(shadow_object);}, 500);
-            triggered_fn()            
+            triggered_fn()
+            drop_accepted_ids.forEach(deactivate_windows); 
          }
          else {
             d3.select("#shadow_object")
@@ -308,6 +311,7 @@ function drag_drop_method() {
                .delay(500)
                .style("display", "none");
             setTimeout(function(g) {document.getElementById("shadow_object").removeChild(shadow_object);}, 500);
+            if (drop_accepted_ids != []) { drop_accepted_ids.forEach(deactivate_windows); }
          }
       });     
 
@@ -317,16 +321,17 @@ function drag_drop_method() {
    drag_drop.status = function() { return drop_accepted; }
    drag_drop.accept = function() { drop_accepted = 1; }
    drag_drop.reject = function() { drop_accepted = 0; }
-   drag_drop.accepted_dest = function(x,y) {
+   drag_drop.accepted_dest = function(x,y,accepted_id) {
       dest_x = x;
       dest_y = y; 
+      if (drop_accepted_ids.indexOf(accepted_id) == -1) { drop_accepted_ids.push(accepted_id); }
    }
    drag_drop.set_id = function(id) {
-      drag_id = id
-      return drag_id
+      drag_id = id;
+      return drag_id;
    }
    drag_drop.set_triggered_fn = function(fn_triggered) {
-      triggered_fn = fn_triggered
+      triggered_fn = fn_triggered;
    }
    return drag_drop;
 }
