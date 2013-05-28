@@ -7,12 +7,15 @@
 
 No: All workspaces are droppable
 Object is just equal to key:value pair;
+Defaults; Selection of Metrics; 
+Categorical; Color Brewer; FID, circle size
+Scatterplot Matrix Brushing (faceting)
+Changing Axes with Dropdown
+Axes range categories
+Top-attached labels
 */
 
-function getDate(d) {
-   return new Date(d);
-}
-
+function getDate(d) { return new Date(d); }
 function x_axis_detail_ticks(scatter_pane_id, width, x_plot_displace, height, y_plot_displace, x_padding, y_padding, x_time_scale) {
    var mouse_xy = [];
    /* Helper Functions */
@@ -80,8 +83,7 @@ function x_axis_detail_ticks(scatter_pane_id, width, x_plot_displace, height, y_
 // Relative to which origin : browser, DOM element, svg?
 /****************************************************/
 function colored_transition() {
-   var b_color = "rgba(128,0,0,0.1)";
-   var t_color = "rgba(128,0,0,0)";
+   var b_color = "rgba(128,0,0,0.1)"; var t_color = "rgba(128,0,0,0)";
    function transition(g) {
       d3.select(this)
          .style("background-color", b_color)
@@ -121,7 +123,7 @@ function toggle_side_section(div_id) {
          .classed("collapsed", true);
    }
    else {
-      d3.select("div#" + div_id)
+         d3.select("div#" + div_id)
          .classed("collapsed", false);                  
    }
 }
@@ -168,9 +170,7 @@ function gen_time_xy_plot(dataset, wkspace_div_id, plot_id) {
    
    function clear_previous() {
       wkspace = document.getElementById(wkspace_div_id)
-      while (wkspace.firstChild) {
-          wkspace.removeChild(wkspace.firstChild);
-      }
+      while (wkspace.firstChild) { wkspace.removeChild(wkspace.firstChild); }
    }
    /**************************************************/
 
@@ -269,8 +269,7 @@ function drag_drop_method() {
    drag_drop_object
       .origin(Object)
       .on("dragstart", function(g) {
-         origin_drag_x = event.x;
-         origin_drag_y = event.y;
+         origin_drag_x = event.x; origin_drag_y = event.y;
          shadow_object = this.cloneNode(true);
          document.getElementById("shadow_object").appendChild(shadow_object);
          if (drop_accepted_ids != []) { drop_accepted_ids.forEach(activate_windows); }
@@ -322,8 +321,7 @@ function drag_drop_method() {
    drag_drop.accept = function() { drop_accepted = 1; }
    drag_drop.reject = function() { drop_accepted = 0; }
    drag_drop.accepted_dest = function(x,y,accepted_id) {
-      dest_x = x;
-      dest_y = y; 
+      dest_x = x; dest_y = y; 
       if (drop_accepted_ids.indexOf(accepted_id) == -1) { drop_accepted_ids.push(accepted_id); }
    }
    drag_drop.set_id = function(id) {
@@ -336,7 +334,6 @@ function drag_drop_method() {
    return drag_drop;
 }
 
-
 function add_drag_listener() {
    document.getElementById("shadow_object")
    d3.select("#workspace")  
@@ -348,6 +345,8 @@ function switch_chart_type () {
    });
 }
 
+function bar_chart() {
+}
 
 // Maybe first write it, then create linking function
 function link_summary_plot(plot_type, variable) {

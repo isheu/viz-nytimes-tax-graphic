@@ -28,6 +28,17 @@ body {
 }
 
 div#main {
+   position: absolute;
+   z-index: 0;
+   left: 190;
+   top: 0;
+   width: 600;
+   height: 800;
+   border-left: solid;
+   border-right: solid;   
+   border-color: #666;
+   border-width: 1px;
+   display: none;
 }
 
 div#workspace {
@@ -53,10 +64,10 @@ div#transparent_workspace {
 
 div#workspace_2 {
    position: absolute;
-   left: 800;
-   top: 500;
-   height: 450;
-   width: 575;
+   left: 200;
+   top: 525;
+   height: 250;
+   width: 400;
    border-width:1px;
    border-style: dotted;
    background-color: #f0f0f0;
@@ -65,17 +76,29 @@ div#workspace_2 {
 div#transparent_workspace_2 {
    z-index: 1;
    position: absolute;
-   left: 800;
-   top: 500;
-   height: 450;
-   width: 575;
+   left: 200;
+   top: 525;
+   height: 250;
+   width: 400;
    background-color: transparent;
+}
+
+div#arrange {
+   cursor: pointer;
+   position: absolute;
+   left: 800;
+   top: 30;
+   text-align: center;
+   height: 15px;
+   width: 45px;
+   border-width: 1px;
+   border-style: outset;
 }
 
 div#list_pane {
    display: inline;
    position: absolute;
-   left: 785;
+   left: 800;
    top: 50;
 }
 
