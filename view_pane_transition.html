@@ -48,6 +48,11 @@
       <div id = "arrange">Arrange</div>
       
       <script type="text/javascript">
+         var x = d3.json("data/dwarf_data_sample.json", function(data) { 
+            console.log(data)
+            return data; 
+         });
+
          var rearrange_status = 0;
          var short_dt_formatter = d3.time.format("%x");
          var price_formatter = d3.format(">,s");
@@ -131,6 +136,11 @@
          var button_efct = button_hover("arrange").set_triggered_fn(layout_arrange_mode);
          d3.select("#arrange").call(button_efct);
 
+      function gen_collapsed_line_plot(dataset, wkspace_div_id, plot_id) {
+         var 
+         dataset.
+         append()
+      }
          // Button to add workspaces?
          // Movable, re-sizeable
 

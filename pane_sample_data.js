@@ -39,4 +39,19 @@ var by_year_data_wide = [
       {"year":"2010", "average": "$22,000", "expenses": "$2,000", "profit": "$20,000"}
       ];
 
-      // - / + Different colors in heat map
+// - / + Different colors in heat map
+var compressed_line_data = [
+      {"group": 1, "tax": 0.1, "size": 1000000},
+      {"group": 1, "tax": 0.25, "size": 1700000},
+      {"group": 1, "tax": 0.15, "size": 2000000},
+      {"group": 1, "tax": 0.30, "size": 1680000},
+      {"group": 1, "tax": 0.13, "size": 500000},
+      {"group": 2, "tax": 0.34, "size": 2700000},
+      {"group": 2, "tax": 0.28, "size": 800000},
+      {"group": 2, "tax": 0.27, "size": 3000000},
+      {"group": 2, "tax": 0.24, "size": 3200000},
+      {"group": 3, "tax": 0.275, "size": 5400000},
+      {"group": 3, "tax": 0.2, "size": 8000000},
+      {"group": 3, "tax": 0.25, "size": 2400000},
+      {"group": 3, "tax": 0.3, "size": 2900000}
+      ];

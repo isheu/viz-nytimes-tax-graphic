@@ -13,6 +13,8 @@ Scatterplot Matrix Brushing (faceting)
 Changing Axes with Dropdown
 Axes range categories
 Top-attached labels
+
+Viewing things in an orderly layout
 */
 
 function getDate(d) { return new Date(d); }
