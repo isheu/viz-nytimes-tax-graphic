@@ -39,7 +39,6 @@ var by_year_data_wide = [
       {"year":"2010", "average": "$22,000", "expenses": "$2,000", "profit": "$20,000"}
       ];
 
-// - / + Different colors in heat map
 var compressed_line_data = [
       {"group": 1, "tax": 0.1, "size": 1000000},
       {"group": 1, "tax": 0.25, "size": 1700000},
