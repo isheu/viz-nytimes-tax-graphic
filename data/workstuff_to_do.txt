@@ -1,0 +1,23 @@
+MUE overpayment format
+Get RVU presentation going
+
+HRR split providers
+
+Stuff for 11-3 by end of the week:
+Zone 1 estimates without adjustment factor for OIG
+Match rate of IRIS data to FID (LE referrals)
+	Why does she want the acceptance rate? 
+Check the Actions.txt for presence / create timestamp prior to FPS custom extract for Zone 1
+
+Stuff for 11-2:
+Remove revoked providers
+6 months window
+Remove certain HCPCS codes
+How to deal with natural dropoff ...
+
+Read time series paper
+Anything with monthly bene-provider diff n' diff?
+
+
+
+Linear force directed chart
