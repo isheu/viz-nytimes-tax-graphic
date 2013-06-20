@@ -81,9 +81,13 @@
                {"name": "test21", "size":8}               
                ]
             }
+         
+         var twidth = 25;
+         var theight = 400;
+         var padding = 2;
 
          var tmap = d3.layout.treemap()
-            .size([25,400])
+            .size([twidth,theight])
             .value(function(d) { return d.size; });
 
          svg = d3.select("#body").append("svg:svg")
@@ -100,18 +104,125 @@
             .attr("width", function(d) { return d.dx + "px" })
             .attr("height", function(d) { return d.dy + "px" });
 
+         var new_data = [];
 
-         svg.selectAll("circle.mapnodecenter")
+         svg.selectAll("circle")
             .data(tmap.nodes(treedata_2))
             .enter().append("circle")
-            .attr("class", "mapnodecenter")
-            .attr("fill", "grey")
+            //.attr("class", "mapnodecenter")
+            .attr("fill", "white")
             .attr("stroke-width", 0)
-            .attr("cx", function(d) { return d.x + (d.dx / 2) + "px" })
-            .attr("cy", function(d) { return d.y + (d.dy / 2) + "px" })
-            //.attr("r", 1);
+            .attr("cx", function(d, i) { 
+                  new_data[i] = {"radius":(d.dx / 2), "x": (d.x + (d.dx / 2)), "y": (d.y + (d.dy / 2))}
+                  d.radius = (d.dx / 2)
+                  d.cx = d.x + (d.dx / 2)
+                  return d.x + (d.dx / 2) + "px" 
+               })
+            .attr("cy", function(d) { 
+               d.cy = d.y + (d.dy / 2)
+               return d.y + (d.dy / 2) + "px" 
+               })
             .attr("r", function(d) { return d.name == "master" ? 1 : (Math.sqrt(d.dx * d.dy) / 2) - 2; });
+         svg.selectAll("circle").remove()            
+         
+         svg.selectAll("circle.mapnodecenter")
+            .data(new_data)
+            .enter().append("circle")
+            .attr("class", "mapnodecenter")
+            .attr("fill", "#333")
+            .attr("stroke", "white")
+            .attr("stroke-width", 1)
+            .attr("cx", function(d, i) { return d.x + "px";})
+            .attr("cy", function(d) { return d.y + "px" })
+            .attr("r", function(d) { return d.radius; });
 
+         var force = d3.layout.force()
+             .nodes(new_data)
+             .size([twidth, theight])
+             .gravity(0.05)
+             .friction(0.1)
+             //.charge(function(d) {return -1 * ((8.5 - d.radius) * 10);})
+             .charge(1)
+             .on("tick", tick)
+             .start();
+
+         var circle = svg.selectAll("circle.mapnodecenter")
+
+         function tick(e) {
+           circle
+               .each(cluster(10 * e.alpha * e.alpha))
+               .each(collide(0.1))
+               .attr("cx", function(d) { return d.x; })
+               .attr("cy", function(d) { return d.y; });
+         }
+
+         // allow 2D movement, but another attribute for x destination
+         // Move d to be adjacent to the cluster node.
+         function cluster(alpha) {
+           var max = [{"radius":0}];
+           new_data.forEach(function(d) {
+             if (d.radius > max[0].radius) {
+               max[0] = d;
+             }
+           });
+           
+           return function(d) {
+             var node = max[0],
+                 l, r, x, y,
+                 k = 1,
+                 i = -1;
+
+             // For cluster nodes, apply custom gravity.
+             if (node == d) {
+               node = {x: twidth / 2, y: theight / 2, radius: d.radius};
+               k = 0.01 * Math.sqrt(d.radius);
+             }
+
+             x = d.x - node.x;
+             y = d.y - node.y;
+             l = Math.sqrt(x * x + y * y);
+             r = d.radius + node.radius;
+             if (l < r) {
+               l = ((l - r) / l) * alpha * k;
+               d.x -= x *= l;
+               d.y -= y *= l;
+               node.x += x;
+               node.y += y;
+             }
+           };
+         }
+         // Resolves collisions between d and all other circles.
+         function collide(alpha) {
+           var quadtree = d3.geom.quadtree(new_data);
+
+           return function(d) {
+                 var r = d.radius + padding,
+                 nx1 = d.x - r,
+                 nx2 = d.x + r,
+                 ny1 = d.y - r,
+                 ny2 = d.y + r;
+
+             quadtree.visit(function(quad, x1, y1, x2, y2) {
+               if (quad.point && (quad.point !== d)) {
+                 var x = d.x - quad.point.x,
+                     y = d.y - quad.point.y,
+                     l = Math.sqrt(x * x + y * y),
+                     r = d.radius + quad.point.radius + (d.x !== quad.point.x) * padding;
+                 if (l <= r) {
+                   l = Math.random() * ((l - r) / l) * alpha;
+                   d.x -= x *= l;
+                   d.y -= y *= l;
+                   quad.point.x += x;
+                   quad.point.y += y;
+                 }
+               }
+               return x1 > nx2
+                   || x2 < nx1
+                   || y1 > ny2
+                   || y2 < ny1;
+             });
+           };
+         }
 
       </script>
    </body>

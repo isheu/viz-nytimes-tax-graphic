@@ -1,9 +1,8 @@
 MUE overpayment format
 Get RVU presentation going
 
-HRR split providers
 
-Stuff for 11-3 by end of the week:
+Stuff for 11-3 by end of the week: ----- put this together
 Zone 1 estimates without adjustment factor for OIG
 Match rate of IRIS data to FID (LE referrals)
 	Why does she want the acceptance rate? 
@@ -15,9 +14,19 @@ Remove revoked providers
 Remove certain HCPCS codes
 How to deal with natural dropoff ...
 
+
 Read time series paper
 Anything with monthly bene-provider diff n' diff?
 
 
-
 Linear force directed chart
+constrained collisions
+
+
+
+We need a thorough documentation of each FPS file. 
+IRIS data questions
+FID data questions
+
+
+HRR split providers
