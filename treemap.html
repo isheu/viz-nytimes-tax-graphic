@@ -82,53 +82,108 @@
                ]
             }
          
-         var twidth = 25;
-         var theight = 400;
-         var padding = 2;
+         var _twidth = 25;
+         var _theight = 400;
+         var padding = 1;
+         var svg_margin = 12;
+
+         function sgm_on_line(twidth, theight, tvalue, dataset) {
+            var tmap = d3.layout.treemap()
+               .size([twidth,theight])
+               .value(function(d) { return d.size; });
+
+            var tick_num = d3.select("body")
+               .append("div").attr("id", "tick_" + tvalue)
+               .style("position", "absolute")
+               .style("left", function() { return tvalue * svg_margin + tvalue * twidth; });
+
+            var svg = d3.select("#tick_" + tvalue).append("svg:svg")
+               .attr("width",twidth + 2 * svg_margin).attr("height",theight)
+            
+            var new_data = [];
+            function generate_sgm_layout() {
+               svg.selectAll("circle")
+                  .data(tmap.nodes(dataset))
+                  .enter().append("circle")
+                  .attr("cx", function(d, i) { 
+                        new_data[i] = {"radius":(d.dx / 2), "x": (d.x + (d.dx / 2) + svg_margin), "y": (d.y + (d.dy / 2) + svg_margin)}
+                        return d.x + (d.dx / 2) + "px" 
+                     })
+                  .attr("cy", function(d) { return d.y + (d.dy / 2) + "px" })
+                  .attr("r", function(d) { return d.name == "master" ? 1 : (Math.sqrt(d.dx * d.dy) / 2) - 2; });
+               svg.selectAll("circle").remove()
+
+               svg.selectAll("circle.tick_el_" + tvalue)
+                  .data(new_data)
+                  .enter().append("circle")
+                  .attr("class", "tick_el_" + tvalue)
+                  .attr("fill", "#333")
+                  .attr("stroke", "white")
+                  .attr("stroke-width", 1)
+                  .attr("cx", function(d, i) { return d.x + "px";})
+                  .attr("cy", function(d) { return d.y + "px" })
+                  .attr("r", function(d) { return d.radius; });
+
+               var force = d3.layout.force()
+                   .nodes(new_data)
+                   .size([twidth, theight])
+                   .gravity(0.05)
+                   .friction(0.1)
+                   .charge(1)
+                   .on("tick", tick)
+                   .start();
+               
+               var circle = svg.selectAll("circle.tick_el_" + tvalue)
+
+               function tick(e) {
+                 circle
+                     .each(cluster(10 * e.alpha * e.alpha, new_data))
+                     .each(collide(0.1, new_data))
+                     .attr("cx", function(d) { return d.x; })
+                     .attr("cy", function(d) { return d.y; });
+               }
+            }
+            return generate_sgm_layout
+         }
+         var line_tick_1 = sgm_on_line(_twidth, _theight, 1, treedata_2);
+         line_tick_1()
+         var line_tick_2 = sgm_on_line(_twidth, _theight, 2, treedata_2);
+         line_tick_2()
+         var line_tick_3 = sgm_on_line(_twidth, _theight, 3, treedata_2);
+         line_tick_3()
+
+         /*
 
          var tmap = d3.layout.treemap()
             .size([twidth,theight])
             .value(function(d) { return d.size; });
 
-         svg = d3.select("#body").append("svg:svg")
-            .attr("width",800)
-            .attr("height",600)
+         var tick_1 = d3.select("body")
+            .append("div")
+            .attr("id", "tick_1")
+            .style("position", "absolute")
+            .style("left", svg_margin);
 
-         svg.selectAll("rect.mapnode")
-            .data(tmap.nodes(treedata_2))
-            .enter().append("rect")
-            .attr("fill", "white")
-            .attr("stroke", "white")
-            .attr("x", function(d) { return d.x + "px" })
-            .attr("y", function(d) { return d.y + "px" })
-            .attr("width", function(d) { return d.dx + "px" })
-            .attr("height", function(d) { return d.dy + "px" });
+         svg = d3.select("#tick_1").append("svg:svg")
+            .attr("width",twidth + 2 * svg_margin)
+            .attr("height",theight)
 
          var new_data = [];
-
          svg.selectAll("circle")
             .data(tmap.nodes(treedata_2))
             .enter().append("circle")
-            //.attr("class", "mapnodecenter")
-            .attr("fill", "white")
-            .attr("stroke-width", 0)
             .attr("cx", function(d, i) { 
-                  new_data[i] = {"radius":(d.dx / 2), "x": (d.x + (d.dx / 2)), "y": (d.y + (d.dy / 2))}
-                  d.radius = (d.dx / 2)
-                  d.cx = d.x + (d.dx / 2)
+                  new_data[i] = {"radius":(d.dx / 2), "x": (d.x + (d.dx / 2) + svg_margin), "y": (d.y + (d.dy / 2) + svg_margin)}
                   return d.x + (d.dx / 2) + "px" 
                })
-            .attr("cy", function(d) { 
-               d.cy = d.y + (d.dy / 2)
-               return d.y + (d.dy / 2) + "px" 
-               })
+            .attr("cy", function(d) { return d.y + (d.dy / 2) + "px" })
             .attr("r", function(d) { return d.name == "master" ? 1 : (Math.sqrt(d.dx * d.dy) / 2) - 2; });
-         svg.selectAll("circle").remove()            
+         svg.selectAll("circle").remove()
          
-         svg.selectAll("circle.mapnodecenter")
+         svg.selectAll("circle.node_1_center")
             .data(new_data)
             .enter().append("circle")
-            .attr("class", "mapnodecenter")
+            .attr("class", "node_1_center")
             .attr("fill", "#333")
             .attr("stroke", "white")
             .attr("stroke-width", 1)
@@ -136,17 +191,17 @@
             .attr("cy", function(d) { return d.y + "px" })
             .attr("r", function(d) { return d.radius; });
 
+
          var force = d3.layout.force()
              .nodes(new_data)
              .size([twidth, theight])
              .gravity(0.05)
              .friction(0.1)
-             //.charge(function(d) {return -1 * ((8.5 - d.radius) * 10);})
              .charge(1)
              .on("tick", tick)
              .start();
-
-         var circle = svg.selectAll("circle.mapnodecenter")
+         
+         var circle = svg.selectAll("circle.node_1_center")
 
          function tick(e) {
            circle
@@ -155,17 +210,17 @@
                .attr("cx", function(d) { return d.x; })
                .attr("cy", function(d) { return d.y; });
          }
+         */
 
          // allow 2D movement, but another attribute for x destination
          // Move d to be adjacent to the cluster node.
-         function cluster(alpha) {
+         function cluster(alpha, other_data) {
            var max = [{"radius":0}];
-           new_data.forEach(function(d) {
+           other_data.forEach(function(d) {
              if (d.radius > max[0].radius) {
                max[0] = d;
              }
-           });
-           
+           });           
            return function(d) {
              var node = max[0],
                  l, r, x, y,
@@ -174,7 +229,7 @@
 
              // For cluster nodes, apply custom gravity.
              if (node == d) {
-               node = {x: twidth / 2, y: theight / 2, radius: d.radius};
+               node = {x: _twidth / 2, y: _theight / 2, radius: d.radius};
                k = 0.01 * Math.sqrt(d.radius);
              }
 
@@ -192,9 +247,8 @@
            };
          }
          // Resolves collisions between d and all other circles.
-         function collide(alpha) {
-           var quadtree = d3.geom.quadtree(new_data);
-
+         function collide(alpha, other_data) {
+           var quadtree = d3.geom.quadtree(other_data);
            return function(d) {
                  var r = d.radius + padding,
                  nx1 = d.x - r,
@@ -223,7 +277,17 @@
              });
            };
          }
-
+         /*
+         svg.selectAll("rect.mapnode")
+            .data(tmap.nodes(treedata_2))
+            .enter().append("rect")
+            .attr("fill", "white")
+            .attr("stroke", "white")
+            .attr("x", function(d) { return d.x + "px" })
+            .attr("y", function(d) { return d.y + "px" })
+            .attr("width", function(d) { return d.dx + "px" })
+            .attr("height", function(d) { return d.dy + "px" });
+         */
       </script>
    </body>
 </html>
