@@ -1,6 +1,19 @@
 <html>
    <head>
       <script type="text/javascript" src="d3.v2.js"></script>
+      <script type="text/javascript" src="treemap_data.js"></script>
+      <script type="text/javascript" src="treemap_cluster.js"></script>
+      <!--<script type="text/javascript" src="treemap_gen_tooltip.js"></script> -->
+      <!-- 
+      To do: tooltip
+      Extend, dive deeper into nesting function
+      translate / transform
+      brush tool
+      encircling path? 
+      label? 
+      refine colliding to 'harden' boundaries between bins?
+      another way to pass data form one variable to another?
+      -->
    </head>
    <body>
       <div id="body">
@@ -8,286 +21,174 @@
       </div>
       </div>
       <script type="text/javascript">
-         var treedata = {
-            "name":"master",
-            "children": [
-               {"name": "test1", "size":16},
-               {"name": "test2", "size":25},
-               {"name": "test3", "size":8},
-               {"name": "test4", "size":9},
-               {"name": "test5", "size":36},
-               {"name": "test6", "size":30},
-               {"name": "test7", "size":25},
-               {"name": "test8", "size":16},
-               {"name": "test9", "size":16},
-               {"name": "test10", "size":50},
-               {"name": "test11", "size":25},
-               {"name": "test12", "size":24},
-               {"name": "test13", "size":10},
-               {"name": "test14", "size":16},
-               {"name": "test15", "size":15},
-               {"name": "test16", "size":32},
-               {"name": "test17", "size":24},
-               {"name": "test18", "size":4},
-               {"name": "test19", "size":4},
-               {"name": "test20", "size":9},
-               {"name": "test21", "size":8}
-               ]
-            }
-         var treedata_2 = {
-            "name":"master",
-            "children": [
-               {"name": "test1", "size":4},
-               {"name": "test2", "size":4},
-               {"name": "test3", "size":8},
-               {"name": "test4", "size":9},
-               {"name": "test5", "size":6},
-               {"name": "test6", "size":25},
-               {"name": "test7", "size":9},
-               {"name": "test8", "size":75},
-               {"name": "test9", "size":30},
-               {"name": "test10", "size":4},
-               {"name": "test11", "size":20},
-               {"name": "test12", "size":24},
-               {"name": "test13", "size":8},
-               {"name": "test14", "size":4},
-               {"name": "test15", "size":7},
-               {"name": "test16", "size":48},
-               {"name": "test17", "size":30},
-               {"name": "test18", "size":8},
-               {"name": "test19", "size":10},
-               {"name": "test20", "size":9},
-               {"name": "test21", "size":8},
-               {"name": "test1", "size":16},
-               {"name": "test2", "size":25},
-               {"name": "test3", "size":8},
-               {"name": "test4", "size":9},
-               {"name": "test5", "size":36},
-               {"name": "test6", "size":30},
-               {"name": "test7", "size":25},
-               {"name": "test8", "size":16},
-               {"name": "test9", "size":16},
-               {"name": "test10", "size":50},
-               {"name": "test11", "size":25},
-               {"name": "test12", "size":24},
-               {"name": "test13", "size":10},
-               {"name": "test14", "size":16},
-               {"name": "test15", "size":15},
-               {"name": "test16", "size":32},
-               {"name": "test17", "size":24},
-               {"name": "test18", "size":4},
-               {"name": "test19", "size":4},
-               {"name": "test20", "size":9},
-               {"name": "test21", "size":8}               
-               ]
-            }
-         
-         var _twidth = 25;
-         var _theight = 400;
+         var svg_height = 400;
+
+         // Chart-level Attributes: sets the bin width, y-location, for the final bubble-axis-aligned graph.
+         var binwidth = 25;
+         var max_radius = 12;
+         var max_binheight = 300;
+         var chart_height = 400;
          var padding = 1;
          var svg_margin = 12;
 
-         function sgm_on_line(twidth, theight, tvalue, dataset) {
-            var tmap = d3.layout.treemap()
-               .size([twidth,theight])
-               .value(function(d) { return d.size; });
+         var main_chart_trans_y = 0;
 
-            var tick_num = d3.select("body")
-               .append("div").attr("id", "tick_" + tvalue)
-               .style("position", "absolute")
-               .style("left", function() { return tvalue * svg_margin + tvalue * twidth; });
-
-            var svg = d3.select("#tick_" + tvalue).append("svg:svg")
-               .attr("width",twidth + 2 * svg_margin).attr("height",theight)
-            
-            var new_data = [];
-            function generate_sgm_layout() {
-               svg.selectAll("circle")
-                  .data(tmap.nodes(dataset))
-                  .enter().append("circle")
-                  .attr("cx", function(d, i) { 
-                        new_data[i] = {"radius":(d.dx / 2), "x": (d.x + (d.dx / 2) + svg_margin), "y": (d.y + (d.dy / 2) + svg_margin)}
-                        return d.x + (d.dx / 2) + "px" 
-                     })
-                  .attr("cy", function(d) { return d.y + (d.dy / 2) + "px" })
-                  .attr("r", function(d) { return d.name == "master" ? 1 : (Math.sqrt(d.dx * d.dy) / 2) - 2; });
-               svg.selectAll("circle").remove()
-
-               svg.selectAll("circle.tick_el_" + tvalue)
-                  .data(new_data)
-                  .enter().append("circle")
-                  .attr("class", "tick_el_" + tvalue)
-                  .attr("fill", "#333")
-                  .attr("stroke", "white")
-                  .attr("stroke-width", 1)
-                  .attr("cx", function(d, i) { return d.x + "px";})
-                  .attr("cy", function(d) { return d.y + "px" })
-                  .attr("r", function(d) { return d.radius; });
-
-               var force = d3.layout.force()
-                   .nodes(new_data)
-                   .size([twidth, theight])
-                   .gravity(0.05)
-                   .friction(0.1)
-                   .charge(1)
-                   .on("tick", tick)
-                   .start();
-               
-               var circle = svg.selectAll("circle.tick_el_" + tvalue)
-
-               function tick(e) {
-                 circle
-                     .each(cluster(10 * e.alpha * e.alpha, new_data))
-                     .each(collide(0.1, new_data))
-                     .attr("cx", function(d) { return d.x; })
-                     .attr("cy", function(d) { return d.y; });
-               }
-            }
-            return generate_sgm_layout
+         var main_svg = d3.select("body").append("svg:svg").attr("id", "main")
+            .attr("width", 800).attr("height", 800);
+         
+         var nested_data = d3.nest()
+            .key(function(d) { return d.bin_id; })
+            .entries(data);
+         
+         // Calculate bin areas, height necessary //
+         var ndata_tot_size = [];
+         var max_tot_size = 0; 
+         var ndata_binheight = [];
+         for (var i = 0; i < nested_data.length; i++) {
+            ndata_tot_size[i] = 0;
+            nested_data[i].values.forEach(function(d) { ndata_tot_size[i] += d.size })
+            if (ndata_tot_size[i] > max_tot_size) { max_tot_size = ndata_tot_size[i]; }
          }
-         var line_tick_1 = sgm_on_line(_twidth, _theight, 1, treedata_2);
-         line_tick_1()
-         var line_tick_2 = sgm_on_line(_twidth, _theight, 2, treedata_2);
-         line_tick_2()
-         var line_tick_3 = sgm_on_line(_twidth, _theight, 3, treedata_2);
-         line_tick_3()
+         for (var i = 0; i < nested_data.length; i++) {
+            ndata_binheight[i] = max_binheight * (Math.sqrt(ndata_tot_size[i]) / Math.sqrt(max_tot_size))
+         }
+         var line_ticks = []
+         for (var i = 0; i < nested_data.length; i++) {         
+            line_ticks[i] = sgm_on_line(binwidth, ndata_binheight[i], nested_data[i].values[0].bin_value, nested_data[i], main_chart_trans_y);
+            line_ticks[i]()
+         }
+         /*********************************************/
 
-         /*
+         var across_ticks = [];
+         setTimeout(function(g) {
+            d3.selectAll(".o_circle")
+               .attr("cx", function(d, i) {
+                  across_ticks[i] =  {"radius": d.radius, "x": d.x + d.t_value * (binwidth + svg_margin) , "y": d.y + (svg_height - d.theight) / 2, "t_value": d.t_value, "name": d.name, "lvl_label": d.another_label, "x_metric": d.x_metric}
+                  return d.x + "px";
+               });
+            d3.selectAll(".o_circle").remove()
+            d3.selectAll("div.tick").remove()
+            main_svg.selectAll(".n_circle")
+               .data(across_ticks, function(d) { return d.name; })
+               .enter().append("circle")
+               .attr("class", "n_circle")
+               .attr("fill", function(d) { return "rgba(96,96,96," + 0.2 * (d.t_value - 4) + ")" ; })
+               .attr("stroke", "white").attr("stroke-width", 1)
+               .attr("cx", function(d, i) { return d.x + "px";})
+               .attr("cy", function(d) { return d.y + "px" })
+               .attr("r", function(d) { return d.radius; });
+            }, 2500);
 
-         var tmap = d3.layout.treemap()
-            .size([twidth,theight])
-            .value(function(d) { return d.size; });
-
-         var tick_1 = d3.select("body")
-            .append("div")
-            .attr("id", "tick_1")
-            .style("position", "absolute")
-            .style("left", svg_margin);
-
-         svg = d3.select("#tick_1").append("svg:svg")
-            .attr("width",twidth + 2 * svg_margin)
-            .attr("height",theight)
-
-         var new_data = [];
-         svg.selectAll("circle")
-            .data(tmap.nodes(treedata_2))
-            .enter().append("circle")
-            .attr("cx", function(d, i) { 
-                  new_data[i] = {"radius":(d.dx / 2), "x": (d.x + (d.dx / 2) + svg_margin), "y": (d.y + (d.dy / 2) + svg_margin)}
-                  return d.x + (d.dx / 2) + "px" 
-               })
-            .attr("cy", function(d) { return d.y + (d.dy / 2) + "px" })
-            .attr("r", function(d) { return d.name == "master" ? 1 : (Math.sqrt(d.dx * d.dy) / 2) - 2; });
-         svg.selectAll("circle").remove()
+         var cluster_force = d3.layout.force()
+         setTimeout(function(g) {
+            cluster_force
+                .nodes(across_ticks)
+                .size([800, 600])
+                .gravity(0)
+                .friction(0.1)
+                .charge(1)
+                .on("tick", cluster_tick)
+                .start()
+            main_svg.append("svg:line")
+                .attr("x1",svg_margin)
+                .attr("y1", function() { return (main_chart_trans_y + chart_height) / 2; })
+                .attr("x2",500)
+                .attr("y2", function() { return (main_chart_trans_y + chart_height) / 2; })
+                .attr("stroke-width", 1)
+                .attr("stroke", "rgba(96,96,96,0.75)")
+                .style("shape-rendering", "crispEdges");
+         }, 3000);
          
-         svg.selectAll("circle.node_1_center")
-            .data(new_data)
-            .enter().append("circle")
-            .attr("class", "node_1_center")
-            .attr("fill", "#333")
-            .attr("stroke", "white")
-            .attr("stroke-width", 1)
-            .attr("cx", function(d, i) { return d.x + "px";})
-            .attr("cy", function(d) { return d.y + "px" })
-            .attr("r", function(d) { return d.radius; });
 
+         var subchart_1_trans_y = 250;
+         var filt_data;
+         setTimeout(function(g) {
+            var filt_data = d3.nest()
+               .key(function(d) { return d.bin_id; })
+               .entries(data.filter(function(d) { return d.another_label == "lvl_1"; }));
 
-         var force = d3.layout.force()
-             .nodes(new_data)
-             .size([twidth, theight])
-             .gravity(0.05)
-             .friction(0.1)
-             .charge(1)
-             .on("tick", tick)
-             .start();
-         
-         var circle = svg.selectAll("circle.node_1_center")
+            max_binheight = 150;
+            ndata_tot_size = [];
+            max_tot_size = 0; 
+            ndata_binheight = [];
+            for (var i = 0; i < filt_data.length; i++) {
+               ndata_tot_size[i] = 0;
+               nested_data[i].values.forEach(function(d) { ndata_tot_size[i] += d.size })
+               if (ndata_tot_size[i] > max_tot_size) { max_tot_size = ndata_tot_size[i]; }
+            }
+            for (var i = 0; i < filt_data.length; i++) {
+               ndata_binheight[i] = max_binheight * (Math.sqrt(ndata_tot_size[i]) / Math.sqrt(max_tot_size))
+            }
+            var line_ticks = []
+            for (var i = 0; i < filt_data.length; i++) {         
+               line_ticks[i] = sgm_on_line(binwidth, ndata_binheight[i], filt_data[i].values[0].bin_value, filt_data[i], subchart_1_trans_y);
+               line_ticks[i]()
+            }
+         }, 4000);
 
-         function tick(e) {
-           circle
-               .each(cluster(10 * e.alpha * e.alpha))
-               .each(collide(0.1))
+         var filt_across_ticks = [];
+
+         setTimeout(function(g) {
+            d3.selectAll(".o_circle")
+               .attr("cx", function(d, i) {
+                  filt_across_ticks[i] =  {"radius": d.radius, "x": d.x + d.t_value * (binwidth + svg_margin) , "y": d.y + subchart_1_trans_y + (svg_height - d.theight) / 2, "t_value": d.t_value, "name": d.name, "lvl_label": d.another_label, "x_metric": d.x_metric}
+                  return d.x + "px";
+               });
+            d3.selectAll(".o_circle").remove()
+            d3.selectAll("div.tick").remove()
+            main_svg.selectAll(".f_circle")
+               .data(filt_across_ticks, function(d) { return d.name; })
+               .enter().append("circle")
+               .attr("class", "f_circle")
+               .attr("fill", function(d) { return "rgba(96,96,96," + 0.2 * (d.t_value - 4) + ")" ; })
+               .attr("stroke", "white").attr("stroke-width", 1)
+               .attr("cx", function(d, i) { return d.x + "px";})
+               .attr("cy", function(d) { return d.y + "px" })
+               .attr("r", function(d) { return d.radius; });
+            }, 5000);
+
+         var cluster_force = d3.layout.force()
+         setTimeout(function(g) {
+            cluster_force
+                .nodes(filt_across_ticks)
+                .size([800, 600])
+                .gravity(0)
+                .friction(0.1)
+                .charge(1)
+                .on("tick", cluster_sub_tick)
+                .start()
+            
+            main_svg.append("svg:line")
+                .attr("x1",svg_margin)
+                .attr("y1", function() { return subchart_1_trans_y + (chart_height / 2); })
+                .attr("x2",500)
+                .attr("y2", function() { return subchart_1_trans_y + (chart_height / 2); })
+                .attr("stroke-width", 1)
+                .attr("stroke", "rgba(96,96,96,0.75)")
+                .style("shape-rendering", "crispEdges");
+         }, 6000);
+
+         var filt_clustered_pos = [];
+         setTimeout(function(g) {
+            d3.selectAll(".f_circle")
+                .attr("r", function(d, i) { 
+                     filt_clustered_pos[i] = {"radius": d.radius, "x": d.x, "y": d.y, "t_value": d.t_value, "name": d.name, "lvl_label": d.another_label, "x_metric": d.x_metric}
+                     return d.radius;
+                   });
+            console.log(filt_clustered_pos)
+         }, 7000);
+         setTimeout(function(g) {
+            d3.selectAll(".f_circle").remove()
+            d3.selectAll(".n_circle")
+               .data(filt_clustered_pos, function(d) { return d.name; })
+               .transition()
+               .duration(1200)
+               .delay(function(d, i) { return (d.x_metric / 10) * 1200; })
                .attr("cx", function(d) { return d.x; })
                .attr("cy", function(d) { return d.y; });
-         }
-         */
+         }, 9000);
 
-         // allow 2D movement, but another attribute for x destination
-         // Move d to be adjacent to the cluster node.
-         function cluster(alpha, other_data) {
-           var max = [{"radius":0}];
-           other_data.forEach(function(d) {
-             if (d.radius > max[0].radius) {
-               max[0] = d;
-             }
-           });           
-           return function(d) {
-             var node = max[0],
-                 l, r, x, y,
-                 k = 1,
-                 i = -1;
 
-             // For cluster nodes, apply custom gravity.
-             if (node == d) {
-               node = {x: _twidth / 2, y: _theight / 2, radius: d.radius};
-               k = 0.01 * Math.sqrt(d.radius);
-             }
-
-             x = d.x - node.x;
-             y = d.y - node.y;
-             l = Math.sqrt(x * x + y * y);
-             r = d.radius + node.radius;
-             if (l < r) {
-               l = ((l - r) / l) * alpha * k;
-               d.x -= x *= l;
-               d.y -= y *= l;
-               node.x += x;
-               node.y += y;
-             }
-           };
-         }
-         // Resolves collisions between d and all other circles.
-         function collide(alpha, other_data) {
-           var quadtree = d3.geom.quadtree(other_data);
-           return function(d) {
-                 var r = d.radius + padding,
-                 nx1 = d.x - r,
-                 nx2 = d.x + r,
-                 ny1 = d.y - r,
-                 ny2 = d.y + r;
-
-             quadtree.visit(function(quad, x1, y1, x2, y2) {
-               if (quad.point && (quad.point !== d)) {
-                 var x = d.x - quad.point.x,
-                     y = d.y - quad.point.y,
-                     l = Math.sqrt(x * x + y * y),
-                     r = d.radius + quad.point.radius + (d.x !== quad.point.x) * padding;
-                 if (l <= r) {
-                   l = Math.random() * ((l - r) / l) * alpha;
-                   d.x -= x *= l;
-                   d.y -= y *= l;
-                   quad.point.x += x;
-                   quad.point.y += y;
-                 }
-               }
-               return x1 > nx2
-                   || x2 < nx1
-                   || y1 > ny2
-                   || y2 < ny1;
-             });
-           };
-         }
-         /*
-         svg.selectAll("rect.mapnode")
-            .data(tmap.nodes(treedata_2))
-            .enter().append("rect")
-            .attr("fill", "white")
-            .attr("stroke", "white")
-            .attr("x", function(d) { return d.x + "px" })
-            .attr("y", function(d) { return d.y + "px" })
-            .attr("width", function(d) { return d.dx + "px" })
-            .attr("height", function(d) { return d.dy + "px" });
-         */
       </script>
    </body>
 </html>

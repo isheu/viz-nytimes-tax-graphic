@@ -1,0 +1,73 @@
+         /*
+
+         var tmap = d3.layout.treemap()
+            .size([twidth,theight])
+            .value(function(d) { return d.size; });
+
+         var tick_1 = d3.select("body")
+            .append("div")
+            .attr("id", "tick_1")
+            .style("position", "absolute")
+            .style("left", svg_margin);
+
+         svg = d3.select("#tick_1").append("svg:svg")
+            .attr("width",twidth + 2 * svg_margin)
+            .attr("height",theight)
+
+         var new_data = [];
+         svg.selectAll("circle")
+            .data(tmap.nodes(treedata_2))
+            .enter().append("circle")
+            .attr("cx", function(d, i) { 
+                  new_data[i] = {"radius":(d.dx / 2), "x": (d.x + (d.dx / 2) + svg_margin), "y": (d.y + (d.dy / 2) + svg_margin)}
+                  return d.x + (d.dx / 2) + "px" 
+               })
+            .attr("cy", function(d) { return d.y + (d.dy / 2) + "px" })
+            .attr("r", function(d) { return d.name == "master" ? 1 : (Math.sqrt(d.dx * d.dy) / 2) - 2; });
+         svg.selectAll("circle").remove()
+         
+         svg.selectAll("circle.node_1_center")
+            .data(new_data)
+            .enter().append("circle")
+            .attr("class", "node_1_center")
+            .attr("fill", "#333")
+            .attr("stroke", "white")
+            .attr("stroke-width", 1)
+            .attr("cx", function(d, i) { return d.x + "px";})
+            .attr("cy", function(d) { return d.y + "px" })
+            .attr("r", function(d) { return d.radius; });
+
+
+         var force = d3.layout.force()
+             .nodes(new_data)
+             .size([twidth, theight])
+             .gravity(0.05)
+             .friction(0.1)
+             .charge(1)
+             .on("tick", tick)
+             .start();
+         
+         var circle = svg.selectAll("circle.node_1_center")
+
+         function tick(e) {
+           circle
+               .each(cluster(10 * e.alpha * e.alpha))
+               .each(collide(0.1))
+               .attr("cx", function(d) { return d.x; })
+               .attr("cy", function(d) { return d.y; });
+         }
+
+         /*
+         svg.selectAll("rect.mapnode")
+            .data(tmap.nodes(treedata_2))
+            .enter().append("rect")
+            .attr("fill", "white")
+            .attr("stroke", "white")
+            .attr("x", function(d) { return d.x + "px" })
+            .attr("y", function(d) { return d.y + "px" })
+            .attr("width", function(d) { return d.dx + "px" })
+            .attr("height", function(d) { return d.dy + "px" });
+         */
+
+         */
+
