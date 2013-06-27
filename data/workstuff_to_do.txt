@@ -2,11 +2,11 @@ MUE overpayment format
 Get RVU presentation going
 
 
-Stuff for 11-3 by end of the week: ----- put this together
-Zone 1 estimates without adjustment factor for OIG
+Stuff for 11-3 by end of the week: ----- put this together			check
+Zone 1 estimates without adjustment factor for OIG				check
 Match rate of IRIS data to FID (LE referrals)
 	Why does she want the acceptance rate? 
-Check the Actions.txt for presence / create timestamp prior to FPS custom extract for Zone 1
+Check the Actions.txt for presence / create timestamp prior to FPS custom extract for Zone 1	check
 
 Stuff for 11-2:
 Remove revoked providers
@@ -15,14 +15,8 @@ Remove certain HCPCS codes
 How to deal with natural dropoff ...
 
 
-Read time series paper
-Anything with monthly bene-provider diff n' diff?
-
-
 Linear force directed chart
 constrained collisions
-
-
 
 We need a thorough documentation of each FPS file. 
 IRIS data questions
@@ -30,3 +24,37 @@ FID data questions
 
 
 HRR split providers
+
+Read time series paper
+Anything with monthly bene-provider diff n' diff?
+
+security quiz
+Pull phys ownership claims
+
+Create summary table of the quant vs. qualitative relationship (days in the past, same-day)
+Any questions about IRIS and FID data - document! Merge IRIS to FID
+Create table of the 11-3 required fields from ZPICs
+	Asking whoever got the Payment Suspension number how they did it
+	"A" field from CMS ARTS
+	Language from the Year 1 RTC
+
+Make changes to 11-2 workbook
+Part D Provider Profile Request **
+
+Cost Avoidance streamlining - Move on to the past revocations investigation
+Write out ZPIC Zone 1 necessary fields. Can we get CMST ARTS "A" fields already?
+
+Extra summary table for drugs? same referring
+
+To add in if there is time:
+mental illness vulnerable benes flag
+dual enrolled flag
+disabled benes flag
+Part D usage
+Referring-visit: with prior G from same referring?
+
+
+RAC overpayment stuff
+
+Add column to Jay's stuff - Avg. lines on bad visits
+find dinner place for fri/sun
