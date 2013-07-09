@@ -19,22 +19,23 @@
       Mapping label to a color
       deal with circles that have out-of-range input, transitions
       -->
+      <style type="text/css">
+      body { margin: 0px 0px 0px 0px; }
+      </style>
    </head>
    <body>
-      <div id="body">
-      <div id="footer">
-      </div>
-      </div>
+      <div id = "tooltip"></div>
+      <div id="body"></div>
       <script type="text/javascript">         
          var svg_height = 400;
 
          // Chart-level Attributes: sets the bin width, y-location, for the final bubble-axis-aligned graph.
-         var binwidth = 25;
-         var max_radius = 12;
-         var max_binheight = 250;
+         var binwidth = 23;
+         var max_radius = 17;
+         var max_binheight = 350;
          var chart_height = 400;
          var padding = 1;
-         var svg_margin = 5;
+         var svg_margin = 10;
 
          var main_chart_trans_y = 0;
 
@@ -69,7 +70,6 @@
                line_ticks[i] = sgm_on_line(binwidth, ndata_binheight[i], nested_data[i].values[0].tax_rate_bin, nested_data[i], main_chart_trans_y);
                line_ticks[i]()
             }
-            
          });
          /******/
 
@@ -77,23 +77,21 @@
 
          var across_ticks = [];
          setTimeout(function(g) {
-            d3.selectAll(".o_circle")
-               .attr("cx", function(d, i) {
-                  across_ticks[i] =  {"radius": d.radius, "x": d.x + (d.t_value / 2) * (binwidth + svg_margin) , "y": d.y + (svg_height - d.theight) / 2, "t_value": d.t_value, "name": d.name, "lvl_label": d.another_label, "x_metric": d.x_metric}
-                  return d.x + "px";
-               });
-            d3.selectAll(".o_circle").remove()
+            d3.selectAll(".o_circle").data().forEach(function(d, i) {
+                  across_ticks[i] =  {"radius": d.radius, "x": d.x + (d.t_value / 2) * (binwidth + svg_margin) , "y": d.y + main_chart_trans_y + (svg_height - d.theight) / 2, "t_value": d.t_value, "name": d.name, "sector": d.sector, "tax_rate": d.tax_rate}
+                  });
             d3.selectAll("div.tick").remove()
             main_svg.selectAll(".n_circle")
                .data(across_ticks, function(d) { return d.name; })
                .enter().append("circle")
                .attr("class", "n_circle")
-               .attr("fill", function(d) { return "rgba(96,96,96," + 0.2 * (d.t_value - 4) + ")" ; })
+               .attr("id", function(d) { return d.name; })
+               .attr("fill", function(d) { return "rgba(96,96,96," + 0.35 * ((d.t_value / 2) % 2 + 1) + ")" ; })
                .attr("stroke", "white").attr("stroke-width", 1)
                .attr("cx", function(d, i) { return d.x + "px";})
                .attr("cy", function(d) { return d.y + "px" })
                .attr("r", function(d) { return d.radius; });
-            }, 2500);
+            }, 3500);
 
          var cluster_force = d3.layout.force()
          setTimeout(function(g) {
@@ -108,28 +106,28 @@
             main_svg.append("svg:line")
                 .attr("x1",svg_margin)
                 .attr("y1", function() { return (main_chart_trans_y + chart_height) / 2; })
-                .attr("x2",500)
+                .attr("x2",1200)
                 .attr("y2", function() { return (main_chart_trans_y + chart_height) / 2; })
                 .attr("stroke-width", 1)
                 .attr("stroke", "rgba(96,96,96,0.75)")
                 .style("shape-rendering", "crispEdges");
-         }, 3000);
+         }, 4000);
          
 
          var subchart_1_trans_y = 250;
          var filt_data;
          setTimeout(function(g) {
             var filt_data = d3.nest()
-               .key(function(d) { return d.bin_id; })
-               .entries(data.filter(function(d) { return d.another_label == "lvl_1"; }));
-
-            max_binheight = 150;
+               .key(function(d) { return d.tax_rate_bin; })
+               .entries(company_data.filter(function(d) { return d.sector == "Information technology"; }));
+            max_binheight = 100;
             ndata_tot_size = [];
             max_tot_size = 0; 
             ndata_binheight = [];
+
             for (var i = 0; i < filt_data.length; i++) {
                ndata_tot_size[i] = 0;
-               nested_data[i].values.forEach(function(d) { ndata_tot_size[i] += d.size })
+               nested_data[i].values.forEach(function(d) { ndata_tot_size[i] += d.capital })
                if (ndata_tot_size[i] > max_tot_size) { max_tot_size = ndata_tot_size[i]; }
             }
             for (var i = 0; i < filt_data.length; i++) {
@@ -137,31 +135,27 @@
             }
             var line_ticks = []
             for (var i = 0; i < filt_data.length; i++) {         
-               line_ticks[i] = sgm_on_line(binwidth, ndata_binheight[i], filt_data[i].values[0].bin_value, filt_data[i], subchart_1_trans_y);
+               line_ticks[i] = sgm_on_line(binwidth, ndata_binheight[i], filt_data[i].values[0].tax_rate_bin, filt_data[i], subchart_1_trans_y);
                line_ticks[i]()
             }
-         }, 4000);
+         }, 5500);
 
          var filt_across_ticks = [];
-
          setTimeout(function(g) {
-            d3.selectAll(".o_circle")
-               .attr("cx", function(d, i) {
-                  filt_across_ticks[i] =  {"radius": d.radius, "x": d.x + (d.t_value / 2) * (binwidth + svg_margin) , "y": d.y + subchart_1_trans_y + (svg_height - d.theight) / 2, "t_value": d.t_value, "name": d.name, "lvl_label": d.another_label, "x_metric": d.x_metric}
-                  return d.x + "px";
+            d3.selectAll(".o_circle").data().forEach(function(d, i) {
+                  filt_across_ticks[i] =  {"radius": d.radius, "x": d.x + (d.t_value / 2) * (binwidth + svg_margin) , "y": d.y + subchart_1_trans_y + (svg_height - d.theight) / 2, "t_value": d.t_value, "name": d.name, "sector": d.sector, "tax_rate": d.tax_rate}
                });
-            d3.selectAll(".o_circle").remove()
             d3.selectAll("div.tick").remove()
             main_svg.selectAll(".f_circle")
                .data(filt_across_ticks, function(d) { return d.name; })
                .enter().append("circle")
                .attr("class", "f_circle")
-               .attr("fill", function(d) { return "rgba(96,96,96," + 0.2 * (d.t_value - 4) + ")" ; })
+               .attr("fill", function(d) { return "rgba(96,96,96," + 0.35 * ((d.t_value / 2) % 2 + 1) + ")" ; })
                .attr("stroke", "white").attr("stroke-width", 1)
                .attr("cx", function(d, i) { return d.x + "px";})
                .attr("cy", function(d) { return d.y + "px" })
                .attr("r", function(d) { return d.radius; });
-            }, 5000);
+            }, 6500);
 
          var cluster_force = d3.layout.force()
          setTimeout(function(g) {
@@ -177,34 +171,34 @@
             main_svg.append("svg:line")
                 .attr("x1",svg_margin)
                 .attr("y1", function() { return subchart_1_trans_y + (chart_height / 2); })
-                .attr("x2",500)
+                .attr("x2",1200)
                 .attr("y2", function() { return subchart_1_trans_y + (chart_height / 2); })
                 .attr("stroke-width", 1)
                 .attr("stroke", "rgba(96,96,96,0.75)")
                 .style("shape-rendering", "crispEdges");
-         }, 6000);
+         }, 7500);
 
          var filt_clustered_pos = [];
          setTimeout(function(g) {
-            d3.selectAll(".f_circle")
-                .attr("r", function(d, i) { 
-                     filt_clustered_pos[i] = {"radius": d.radius, "x": d.x, "y": d.y, "t_value": d.t_value, "name": d.name, "lvl_label": d.another_label, "x_metric": d.x_metric}
-                     return d.radius;
-                   });
-            console.log(filt_clustered_pos)
-         }, 7000);
+            d3.selectAll(".f_circle").data().forEach(function(d, i) { 
+                     filt_clustered_pos[i] = {"radius": d.radius, "x": d.x, "y": d.y, "t_value": d.t_value, "name": d.name, "sector": d.sector, "tax_rate": d.tax_rate}
+                  });
+         }, 8000);
          setTimeout(function(g) {
             d3.selectAll(".f_circle").remove()
             d3.selectAll(".n_circle")
                .data(filt_clustered_pos, function(d) { return d.name; })
-               .transition()
-               .duration(1200)
-               .delay(function(d, i) { return (d.x_metric / 10) * 1200; })
+               .attr("id", function(d) { return d.name })
+               .transition().duration(1200)
+               .delay(function(d, i) { return (d.tax_rate / 100) * 1200; })
                .attr("cx", function(d) { return d.x; })
-               .attr("cy", function(d) { return d.y; });
+               .attr("cy", function(d) { return d.y; })
+            
+            d3.selectAll(".n_circle")
+               .on("mouseover", function() { d3.select(this).attr("stroke", "black"); })
+               .on("mouseout", function() { d3.select(this).attr("stroke", "white") });
          }, 9000);
 
       </script>
    </body>
 </html>
-

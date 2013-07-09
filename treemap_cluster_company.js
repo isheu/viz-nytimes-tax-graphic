@@ -1,3 +1,19 @@
+// Create programmatic "resistance" but not barrier if a circle crosses its bin
+// Can I modify the treemap layout to randomize/alternative large squares?
+// what are those DOM exceptions?
+
+function tooltip(ttip_data, height, width) {
+   var content_height = height;
+   var content_width = width;
+   // Generalizable tooltip
+   function draw_tooltip() {
+      d3.select("#tooltip")
+         .data(ttip_data)
+         .enter().append("li");
+      }
+   return draw_tooltip
+}
+
 function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
    var tmap = d3.layout.treemap()
       .size([twidth,theight])
@@ -13,21 +29,16 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
 
    var svg = d3.selectAll("#tick_" + tvalue).append("svg:svg")
       .attr("width",twidth + 2 * svg_margin).attr("height",theight)
-   
+
    var new_data = [];
    function generate_sgm_layout() {
-      svg.selectAll("circle")
-         .data(tmap.nodes(dataset))
-         .enter().append("circle")
-         .attr("cx", function(d, i) { 
-               new_data[i] = {"radius":((Math.sqrt(d.capital) / Math.sqrt(250000)) * max_radius), "x": (d.x + (d.dx / 2) + svg_margin), "y": (d.y + (d.dy / 2) + svg_margin), "t_value": tvalue, "theight": theight, "name": d.name, "lvl_label": d.sector, "x_metric": d.tax_rate_bin}
-               return d.x + (d.dx / 2)
-            })
-         .attr("cy", function(d) { return d.y + (d.dy / 2) })
-         .attr("r", function(d) { return d.name == "master" ? 1 : (Math.sqrt(d.dx * d.dy) / 2) - 2; });
-
-      svg.selectAll("circle").remove()
+      console.log(tmap.nodes(dataset))
+      tmap.nodes(dataset).forEach(function(d, i) {
+            new_data[i] = {"radius":((Math.sqrt(d.capital) / Math.sqrt(250000)) * max_radius), "x": (d.x + (d.dx / 2) + svg_margin), "y": (d.y + (d.dy / 2) + svg_margin), "t_value": tvalue, "theight": theight, "name": d.name, "sector": d.sector, "tax_rate": d.tax_rate}
+         });
+      bad_data = new_data.filter(function(d) { return !(d.radius > 0); })
       new_data = new_data.filter(function(d) { return d.radius > 0; })
+      //console.log(bad_data);
       
       svg.selectAll("circle.o_circle")
          .data(new_data)
@@ -48,6 +59,7 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
           .gravity(0.08)
           .friction(0.1)
           .charge(1)
+          //.alpha(20)
           .on("tick", tick)
           .start();
       
@@ -69,7 +81,7 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
 function cluster_tick(e) {
     main_svg.selectAll(".n_circle")
        .each(cl_cluster(1 * e.alpha * e.alpha, across_ticks))
-       .each(collide(0.1, across_ticks))
+       .each(collide(0.25, across_ticks))
        .attr("cx", function(d) { return d.x; })
        .attr("cy", function(d) { return d.y; })
        //.call(cluster_force.drag);

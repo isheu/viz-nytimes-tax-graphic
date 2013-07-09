@@ -38,13 +38,13 @@
          var main_svg = d3.select("body").append("svg:svg").attr("id", "main")
             .attr("width", 800).attr("height", 800);
 
-         /*
+         
          var nested_data = d3.nest()
             .key(function(d) { return d.bin_id; })
             .entries(data);
-         */
 
          /******/
+         /*
          var company_data = [];
          var nested_data;
          d3.csv("data/companies.csv", function(dataset) {
@@ -54,26 +54,28 @@
                nested_data = d3.nest()
                   .key(function(d) { return d.tax_rate; })
                   .entries(company_data);
-            });
-         /******/
+         });
+         */
 
+         /******/
          // Calculate bin areas, height necessary //
-         var ndata_tot_size = [];
-         var max_tot_size = 0; 
-         var ndata_binheight = [];
-         for (var i = 0; i < nested_data.length; i++) {
-            ndata_tot_size[i] = 0;
-            nested_data[i].values.forEach(function(d) { ndata_tot_size[i] += d.size })
-            if (ndata_tot_size[i] > max_tot_size) { max_tot_size = ndata_tot_size[i]; }
-         }
-         for (var i = 0; i < nested_data.length; i++) {
-            ndata_binheight[i] = max_binheight * (Math.sqrt(ndata_tot_size[i]) / Math.sqrt(max_tot_size))
-         }
-         var line_ticks = []
-         for (var i = 0; i < nested_data.length; i++) {         
-            line_ticks[i] = sgm_on_line(binwidth, ndata_binheight[i], nested_data[i].values[0].bin_value, nested_data[i], main_chart_trans_y);
-            line_ticks[i]()
-         }
+            var ndata_tot_size = [];
+            var max_tot_size = 0; 
+            var ndata_binheight = [];
+            for (var i = 0; i < nested_data.length; i++) {
+               ndata_tot_size[i] = 0;
+               nested_data[i].values.forEach(function(d) { ndata_tot_size[i] += d.size })
+               if (ndata_tot_size[i] > max_tot_size) { max_tot_size = ndata_tot_size[i]; }
+            }
+            for (var i = 0; i < nested_data.length; i++) {
+               ndata_binheight[i] = max_binheight * (Math.sqrt(ndata_tot_size[i]) / Math.sqrt(max_tot_size))
+            }
+            var line_ticks = []
+            for (var i = 0; i < nested_data.length; i++) {         
+               line_ticks[i] = sgm_on_line(binwidth, ndata_binheight[i], nested_data[i].values[0].bin_value, nested_data[i], main_chart_trans_y);
+               line_ticks[i]()
+            }
+         
          /*********************************************/
 
          var across_ticks = [];
@@ -204,6 +206,7 @@
                .attr("cx", function(d) { return d.x; })
                .attr("cy", function(d) { return d.y; });
          }, 9000);
+
       </script>
    </body>
 </html>
