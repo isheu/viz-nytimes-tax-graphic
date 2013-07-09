@@ -2,13 +2,13 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
    var tmap = d3.layout.treemap()
       .size([twidth,theight])
       .children(function(d) { return d.values; })
-      .value(function(d) { return d.size; });
+      .value(function(d) { return d.capital; });
 
    var tick_num = d3.select("body")
       .append("div").attr("id", "tick_" + tvalue)
       .attr("class", "tick")
       .style("position", "absolute")
-      .style("left", function() { return tvalue * svg_margin + tvalue * twidth; })
+      .style("left", function() { return (tvalue / 2) * svg_margin + (tvalue / 2) * twidth; })
       .style("top", function() { return translate_y + (svg_height - theight) / 2 });
 
    var svg = d3.selectAll("#tick_" + tvalue).append("svg:svg")
@@ -20,14 +20,15 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
          .data(tmap.nodes(dataset))
          .enter().append("circle")
          .attr("cx", function(d, i) { 
-               new_data[i] = {"radius":((Math.sqrt(d.size) / Math.sqrt(75)) * max_radius), "x": (d.x + (d.dx / 2) + svg_margin), "y": (d.y + (d.dy / 2) + svg_margin), "t_value": tvalue, "theight": theight, "name": d.name, "lvl_label": d.another_label, "x_metric": d.x_metric}
-               return d.x + (d.dx / 2) + "px" 
+               new_data[i] = {"radius":((Math.sqrt(d.capital) / Math.sqrt(250000)) * max_radius), "x": (d.x + (d.dx / 2) + svg_margin), "y": (d.y + (d.dy / 2) + svg_margin), "t_value": tvalue, "theight": theight, "name": d.name, "lvl_label": d.sector, "x_metric": d.tax_rate_bin}
+               return d.x + (d.dx / 2)
             })
-         .attr("cy", function(d) { return d.y + (d.dy / 2) + "px" })
+         .attr("cy", function(d) { return d.y + (d.dy / 2) })
          .attr("r", function(d) { return d.name == "master" ? 1 : (Math.sqrt(d.dx * d.dy) / 2) - 2; });
+
       svg.selectAll("circle").remove()
       new_data = new_data.filter(function(d) { return d.radius > 0; })
-
+      
       svg.selectAll("circle.o_circle")
          .data(new_data)
          .enter().append("circle")
@@ -36,14 +37,15 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
          .attr("fill", "#333")
          .attr("stroke", "white")
          .attr("stroke-width", 1)
-         .attr("cx", function(d, i) { return d.x + "px";})
-         .attr("cy", function(d) { return d.y + "px" })
+         .attr("cx", function(d, i) { return d.x;})
+         .attr("cy", function(d) { return d.y})
          .attr("r", function(d) { return d.radius; });
+
 
       var force = d3.layout.force()
           .nodes(new_data)
           .size([twidth, theight])
-          .gravity(0.05)
+          .gravity(0.08)
           .friction(0.1)
           .charge(1)
           .on("tick", tick)
@@ -59,6 +61,7 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
             .attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
       }
+
    }
    return generate_sgm_layout
 }
@@ -172,3 +175,4 @@ function collide(alpha, other_data) {
     });
   };
 }
+
