@@ -32,13 +32,11 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
 
    var new_data = [];
    function generate_sgm_layout() {
-      console.log(tmap.nodes(dataset))
+      //console.log(tmap.nodes(dataset))
       tmap.nodes(dataset).forEach(function(d, i) {
-            new_data[i] = {"radius":((Math.sqrt(d.capital) / Math.sqrt(250000)) * max_radius), "x": (d.x + (d.dx / 2) + svg_margin), "y": (d.y + (d.dy / 2) + svg_margin), "t_value": tvalue, "theight": theight, "name": d.name, "sector": d.sector, "tax_rate": d.tax_rate}
+            new_data[i] = {"radius":((Math.sqrt(+d.capital) / Math.sqrt(250000)) * max_radius), "x": (d.x + (d.dx / 2) + svg_margin), "y": (d.y + (d.dy / 2) + svg_margin), "t_value": tvalue, "theight": theight, "name": d.name, "sector": d.sector, "tax_rate": d.tax_rate, "capital":+d.capital}
          });
-      bad_data = new_data.filter(function(d) { return !(d.radius > 0); })
       new_data = new_data.filter(function(d) { return d.radius > 0; })
-      //console.log(bad_data);
       
       svg.selectAll("circle.o_circle")
          .data(new_data)
@@ -64,7 +62,7 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
           .start();
       
       var circle = svg.selectAll("circle.o_circle")
-
+      
       function tick(e) {
         circle
             .each(cluster(10 * e.alpha * e.alpha, new_data))
@@ -73,8 +71,9 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
             .attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
       }
-
+      
    }
+   
    return generate_sgm_layout
 }
 
