@@ -32,24 +32,22 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
 
    var new_data = [];
    function generate_sgm_layout() {
-      //console.log(tmap.nodes(dataset))
       tmap.nodes(dataset).forEach(function(d, i) {
             new_data[i] = {"radius":((Math.sqrt(+d.capital) / Math.sqrt(250000)) * max_radius), "x": (d.x + (d.dx / 2) + svg_margin), "y": (d.y + (d.dy / 2) + svg_margin), "t_value": tvalue, "theight": theight, "name": d.name, "sector": d.sector, "tax_rate": d.tax_rate, "capital":+d.capital}
          });
       new_data = new_data.filter(function(d) { return d.radius > 0; })
       
-      svg.selectAll("circle.o_circle")
+      svg.selectAll("circle.by_tick_circle")
          .data(new_data)
          .enter().append("circle")
          .attr("id", function(d) { return d.name; })
-         .attr("class", "o_circle")
+         .attr("class", "by_tick_circle")
          .attr("fill", "#333")
          .attr("stroke", "white")
          .attr("stroke-width", 1)
          .attr("cx", function(d, i) { return d.x;})
          .attr("cy", function(d) { return d.y})
          .attr("r", function(d) { return d.radius; });
-
 
       var force = d3.layout.force()
           .nodes(new_data)
@@ -61,17 +59,16 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
           .on("tick", tick)
           .start();
       
-      var circle = svg.selectAll("circle.o_circle")
+      var circle = svg.selectAll("circle.by_tick_circle")
       
       function tick(e) {
         circle
             .each(cluster(10 * e.alpha * e.alpha, new_data))
             .each(collide(0.1, new_data))
-            //.attr("cx", function(d) { return d.x = Math.max(d.radius, Math.min((tvalue * svg_margin + tvalue * twidth) - d.radius, d.x)); })
+            //.attr("cx", function(d) { return d.x = Math.max(d.radius, Math.min((tvalue * svg_margin + tvalue * twidth) - d.radius, d.x)); }) // Bounding BOX?
             .attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
       }
-      
    }
    
    return generate_sgm_layout
@@ -79,8 +76,8 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
 
 function cluster_tick(e) {
     main_svg.selectAll(".n_circle")
-       .each(cl_cluster(1 * e.alpha * e.alpha, across_ticks))
-       .each(collide(0.25, across_ticks))
+       .each(cl_cluster(1 * e.alpha * e.alpha, flattened_data_w_pos))
+       .each(collide(0.25, flattened_data_w_pos))
        .attr("cx", function(d) { return d.x; })
        .attr("cy", function(d) { return d.y; })
        //.call(cluster_force.drag);
@@ -88,8 +85,8 @@ function cluster_tick(e) {
 
 function cluster_sub_tick(e) {
     main_svg.selectAll(".f_circle")
-       .each(cl_cluster(1 * e.alpha * e.alpha, filt_across_ticks))
-       .each(collide(0.1, filt_across_ticks))
+       .each(cl_cluster(1 * e.alpha * e.alpha, filt_flattened_data_w_pos))
+       .each(collide(0.1, filt_flattened_data_w_pos))
        .attr("cx", function(d) { return d.x; })
        .attr("cy", function(d) { return d.y; })
        //.call(cluster_force.drag);

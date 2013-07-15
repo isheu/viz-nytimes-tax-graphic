@@ -70,4 +70,34 @@
          */
 
          */
+         /*
+         var filt_flattened_data_w_pos = [];
+         setTimeout(function(g) {
+            d3.selectAll(".by_tick_circle").data().forEach(function(d, i) {
+                  filt_flattened_data_w_pos[i] =  {"radius": d.radius, "x": d.x + (d.t_value / 2) * (binwidth + svg_margin) , "y": d.y + subchart_1_trans_y + (svg_height - d.theight) / 2, "t_value": d.t_value, "name": d.name, "sector": d.sector, "tax_rate": d.tax_rate}
+               });
+            d3.selectAll("div.tick").remove()
+            main_svg.selectAll(".f_circle")
+               .data(filt_flattened_data_w_pos, function(d) { return d.name; })
+               .enter().append("circle")
+               .attr("class", "f_circle")
+               .attr("fill", function(d) { return "rgba(96,96,96," + 0.35 * ((d.t_value / 2) % 2 + 1) + ")" ; })
+               .attr("cx", function(d, i) { return d.x + "px";})
+               .attr("cy", function(d) { return d.y + "px" })
+               .attr("r", function(d) { return d.radius; });
+            }, 6500);
+
+         var cluster_force = d3.layout.force()
+         setTimeout(function(g) {
+            cluster_force
+                .nodes(filt_flattened_data_w_pos)
+                .size([800, 600])
+                .gravity(0)
+                .friction(0.1)
+                .charge(1)
+                .on("tick", cluster_sub_tick)
+                .start()
+         }, 7500);
+         */
+
 

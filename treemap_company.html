@@ -3,6 +3,9 @@
       <script type="text/javascript" src="d3.v2.js"></script>
       <script type="text/javascript" src="treemap_data.js"></script>
       <script type="text/javascript" src="treemap_cluster_company.js"></script>
+      <link rel="stylesheet" type="text/css" href="treemap_styles.css" />
+      <!-- Group translate -->
+      <!-- Infographic vs. data exploration -->
       <!--<script type="text/javascript" src="treemap_gen_tooltip.js"></script> -->
       <!--<script type="text/javascript" src="treemap_search_thru.js"></script> -->
       <!-- 
@@ -18,10 +21,8 @@
 
       Mapping label to a color
       deal with circles that have out-of-range input, transitions
+      need nested selections?
       -->
-      <style type="text/css">
-      body { margin: 0px 0px 0px 0px; }
-      </style>
    </head>
    <body>
       <div id = "tooltip"></div>
@@ -43,18 +44,30 @@
             .attr("width", 1200).attr("height", 800);
 
          /******/
-         var company_data = [];
-         var nested_data;
-         var ndata_tot_size = [];
-         var max_tot_size = 0; 
-         var ndata_binheight = [];         
+         var company_data = [], nested_data;
+         var ndata_tot_size = [], max_tot_size = 0, ndata_binheight = [];
          d3.csv("data/proc_companies.csv", function(dataset) {
             dataset.forEach(function(d) {
-               company_data.push({"name":d.name, "alias":d.alias, "symbol":d.symbol, "pos_x":Math.floor(d.x), "pos_y":Math.floor(d.y), "subpos_x":Math.floor(d.cx), "subpos_y":Math.floor(d.cy), "capital":Math.floor(d.capitalization), "earnings":Math.floor(d.earnings), "taxes":Math.floor(d.taxes), "tax_rate":d.tax_rate * 100, "sector":d.sector, "tax_rate_bin":Math.floor(d.tax_rate_bin * 100)})
+               company_data.push({
+                  "name":d.name, 
+                  "alias":d.alias, 
+                  "symbol":d.symbol, 
+                  "pos_x":Math.floor(d.x), 
+                  "pos_y":Math.floor(d.y), 
+                  "subpos_x":Math.floor(d.cx), 
+                  "subpos_y":Math.floor(d.cy), 
+                  "capital":Math.floor(d.capitalization), 
+                  "earnings":Math.floor(d.earnings), 
+                  "taxes":Math.floor(d.taxes), 
+                  "tax_rate":d.tax_rate * 100, 
+                  "sector":d.sector, 
+                  "tax_rate_bin":Math.floor(d.tax_rate_bin * 100)
+                  })
             })
             nested_data = d3.nest()
                .key(function(d) { return d.tax_rate_bin; })
                .entries(company_data);
+            
             // Calculate bin areas, height necessary //
             for (var i = 0; i < nested_data.length; i++) {
                ndata_tot_size[i] = 0;
@@ -74,46 +87,69 @@
 
          /*********************************************/
 
-         var across_ticks = [];
+         main_svg.append("svg:line")
+             .attr("class", "x_line")
+             .attr("x1", svg_margin)
+             .attr("y1", function() { return (main_chart_trans_y + chart_height) / 2; })
+             .attr("x2", 1200)
+             .attr("y2", function() { return (main_chart_trans_y + chart_height) / 2; });
 
-         setTimeout(visualize_placed_bubbles, 3500);
-         function visualize_placed_bubbles() {
-            d3.selectAll(".o_circle").data().forEach(function(d, i) {
-                  across_ticks[i] =  {"radius": d.radius, "x": d.x + (d.t_value / 2) * (binwidth + svg_margin) , "y": d.y + main_chart_trans_y + (svg_height - d.theight) / 2, "t_value": d.t_value, "name": d.name, "sector": d.sector, "tax_rate": d.tax_rate}
-                  });
-            d3.selectAll("div.tick").remove()
-            main_svg.selectAll(".n_circle")
-               .data(across_ticks, function(d) { return d.name; })
-               .enter().append("circle")
-               .attr("class", "n_circle")
-               .attr("id", function(d) { return d.name; })
-               .attr("fill", function(d) { return "rgba(96,96,96," + 0.35 * ((d.t_value / 2) % 2 + 1) + ")" ; })
-               .attr("stroke", "white").attr("stroke-width", 1)
-               .attr("cx", function(d, i) { return d.x + "px";})
-               .attr("cy", function(d) { return d.y + "px" })
-               .attr("r", function(d) { return d.radius; });
-         }
-         
+         var flattened_data_w_pos = [];
+         full_data_flatten = flatten_placed_bubbles("n_circle", flattened_data_w_pos, 0)
+
          var cluster_force = d3.layout.force()
-         setTimeout(function(g) {
-            cluster_force
-                .nodes(across_ticks)
-                .size([800, 600])
-                .gravity(0)
-                .friction(0.1)
-                .charge(1)
-                .on("tick", cluster_tick)
-                .start()
-            main_svg.append("svg:line")
-                .attr("x1",svg_margin)
-                .attr("y1", function() { return (main_chart_trans_y + chart_height) / 2; })
-                .attr("x2",1200)
-                .attr("y2", function() { return (main_chart_trans_y + chart_height) / 2; })
-                .attr("stroke-width", 1)
-                .attr("stroke", "rgba(96,96,96,0.75)")
-                .style("shape-rendering", "crispEdges");
-         }, 4000);
+         full_data_cluster_fn = apply_cluster_force_algo()
+         full_data_cluster_fn
+            .set_dataset(flattened_data_w_pos)
+            .set_tick_fn(cluster_tick)
+
+         setTimeout(full_data_flatten, 3500);
+         setTimeout(full_data_cluster_fn, 4000);
          
+         function flatten_placed_bubbles(out_circle_id, dataset_id, y_displace) {
+            function flatten_placed_bubbles() {
+               d3.selectAll(".by_tick_circle").data().forEach(function(d, i) {
+                     dataset_id[i] =  {
+                        "radius": d.radius, 
+                        "x": d.x + (d.t_value / 2) * (binwidth + svg_margin), 
+                        "y": d.y + main_chart_trans_y + y_displace + (svg_height - d.theight) / 2, 
+                        "t_value": d.t_value, 
+                        "name": d.name, 
+                        "sector": d.sector, 
+                        "tax_rate": d.tax_rate}
+                     });
+               d3.selectAll("div.tick").remove()
+               main_svg.selectAll("." + out_circle_id)
+                  .data(dataset_id, function(d) { return d.name; })
+                  .enter().append("circle")
+                  .attr("class", out_circle_id).attr("id", function(d) { return d.name; })
+                  .attr("fill", function(d) { return "rgba(96,96,96," + 0.35 * ((d.t_value / 2) % 2 + 1) + ")" ; })
+                  .attr("cx", function(d, i) { return d.x; })
+                  .attr("cy", function(d) { return d.y; })
+                  .attr("r", function(d) { return d.radius; });
+            }
+            return flatten_placed_bubbles;
+         }
+
+         function apply_cluster_force_algo() {
+            var dataset, tick_fn;
+            function start_cluster_algo() {
+               cluster_force
+                   .nodes(dataset).size([800, 600])
+                   .gravity(0).friction(0.1).charge(1)
+                   .on("tick", tick_fn)
+                   .start();
+            }
+            start_cluster_algo.set_dataset = function(user_dataset) {
+               dataset = user_dataset
+               return start_cluster_algo;
+            }            
+            start_cluster_algo.set_tick_fn = function(user_tick_fn) {
+               tick_fn = user_tick_fn
+               return start_cluster_algo;
+            }
+            return start_cluster_algo;
+         }
 
          var subchart_1_trans_y = 250;
          var filt_data;
@@ -122,9 +158,7 @@
                .key(function(d) { return d.tax_rate_bin; })
                .entries(company_data.filter(function(d) { return d.sector == "Information technology"; }));
             max_binheight = 100;
-            ndata_tot_size = [];
-            max_tot_size = 0; 
-            ndata_binheight = [];
+            ndata_tot_size = [], max_tot_size = 0, ndata_binheight = [];
 
             for (var i = 0; i < filt_data.length; i++) {
                ndata_tot_size[i] = 0;
@@ -141,51 +175,27 @@
             }
          }, 5500);
 
-         var filt_across_ticks = [];
-         setTimeout(function(g) {
-            d3.selectAll(".o_circle").data().forEach(function(d, i) {
-                  filt_across_ticks[i] =  {"radius": d.radius, "x": d.x + (d.t_value / 2) * (binwidth + svg_margin) , "y": d.y + subchart_1_trans_y + (svg_height - d.theight) / 2, "t_value": d.t_value, "name": d.name, "sector": d.sector, "tax_rate": d.tax_rate}
-               });
-            d3.selectAll("div.tick").remove()
-            main_svg.selectAll(".f_circle")
-               .data(filt_across_ticks, function(d) { return d.name; })
-               .enter().append("circle")
-               .attr("class", "f_circle")
-               .attr("fill", function(d) { return "rgba(96,96,96," + 0.35 * ((d.t_value / 2) % 2 + 1) + ")" ; })
-               .attr("stroke", "white").attr("stroke-width", 1)
-               .attr("cx", function(d, i) { return d.x + "px";})
-               .attr("cy", function(d) { return d.y + "px" })
-               .attr("r", function(d) { return d.radius; });
-            }, 6500);
+         main_svg.append("svg:line")
+            .attr("x1",svg_margin)
+            .attr("y1", function() { return subchart_1_trans_y + (chart_height / 2); })
+            .attr("x2",1200)
+            .attr("y2", function() { return subchart_1_trans_y + (chart_height / 2); })
+            .attr("class", "x_line");
+         
+         var filt_flattened_data_w_pos = [];
+         filt_data_flatten = flatten_placed_bubbles("f_circle", filt_flattened_data_w_pos, subchart_1_trans_y)
+         setTimeout(filt_data_flatten, 6500);
 
          var cluster_force = d3.layout.force()
-         setTimeout(function(g) {
-            cluster_force
-                .nodes(filt_across_ticks)
-                .size([800, 600])
-                .gravity(0)
-                .friction(0.1)
-                .charge(1)
-                .on("tick", cluster_sub_tick)
-                .start()
-            
-            main_svg.append("svg:line")
-                .attr("x1",svg_margin)
-                .attr("y1", function() { return subchart_1_trans_y + (chart_height / 2); })
-                .attr("x2",1200)
-                .attr("y2", function() { return subchart_1_trans_y + (chart_height / 2); })
-                .attr("stroke-width", 1)
-                .attr("stroke", "rgba(96,96,96,0.75)")
-                .style("shape-rendering", "crispEdges");
-         }, 7500);
+         filt_data_cluster_fn = apply_cluster_force_algo()
+         filt_data_cluster_fn.set_dataset(filt_flattened_data_w_pos).set_tick_fn(cluster_sub_tick)
+         setTimeout(filt_data_cluster_fn, 7500);
 
          var filt_clustered_pos = [];
          setTimeout(function(g) {
             d3.selectAll(".f_circle").data().forEach(function(d, i) { 
                      filt_clustered_pos[i] = {"radius": d.radius, "x": d.x, "y": d.y, "t_value": d.t_value, "name": d.name, "sector": d.sector, "tax_rate": d.tax_rate}
-                  });
-         }, 8000);
-         setTimeout(function(g) {
+                  });         
             d3.selectAll(".f_circle").remove()
             d3.selectAll(".n_circle")
                .data(filt_clustered_pos, function(d) { return d.name; })
