@@ -1,8 +1,9 @@
+
 body { 
    margin: 0px 0px 0px 0px; 
 }
 .n_circle, .f_circle {
-   stroke: white;
+   // stroke: white;
    stroke-width: 1;
 }
 line.x_line {

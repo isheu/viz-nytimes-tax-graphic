@@ -74,13 +74,15 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
    return generate_sgm_layout
 }
 
+
+
 function cluster_tick_fn(e) {
    var obj_id;
    var data_id;
    function update_pos(e) {
       main_svg.selectAll("." + obj_id)
           .each(cl_cluster(1 * e.alpha * e.alpha, data_id))
-          .each(collide(0.25, data_id))
+          .each(collide(0.2, data_id))
           .attr("cx", function(d) { return d.x; })
           .attr("cy", function(d) { return d.y; })
    }

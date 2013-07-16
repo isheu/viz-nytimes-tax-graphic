@@ -20,7 +20,8 @@
       another way to pass data from one variable to another?
 
 
-      When should I use closures? When should I not? WTF is the deal with the SetTimeout callback functions?????
+      When should I use closures? When should I not? WTF is the deal with the SetTimeout callback functions????? Called functions vs. pointers to functions
+      Why is it taking longer for the force layout to converge?????
       Mapping label to a color
       deal with circles that have out-of-range input, transitions
       need nested selections?
@@ -41,6 +42,7 @@
          var svg_margin = 10;
 
          var main_chart_trans_y = 0;
+         var subchart_1_trans_y = 250;
 
          var main_svg = d3.select("body").append("svg:svg").attr("id", "main")
             .attr("width", 1200).attr("height", 800);
@@ -51,19 +53,10 @@
          d3.csv("data/proc_companies.csv", function(dataset) {
             dataset.forEach(function(d) {
                company_data.push({
-                  "name":d.name, 
-                  "alias":d.alias, 
-                  "symbol":d.symbol, 
-                  "pos_x":Math.floor(d.x), 
-                  "pos_y":Math.floor(d.y), 
-                  "subpos_x":Math.floor(d.cx), 
-                  "subpos_y":Math.floor(d.cy), 
-                  "capital":Math.floor(d.capitalization), 
-                  "earnings":Math.floor(d.earnings), 
-                  "taxes":Math.floor(d.taxes), 
-                  "tax_rate":d.tax_rate * 100, 
-                  "sector":d.sector, 
-                  "tax_rate_bin":Math.floor(d.tax_rate_bin * 100)
+                  "name":d.name, "alias":d.alias, "symbol":d.symbol, 
+                  "pos_x":Math.floor(d.x), "pos_y":Math.floor(d.y), "subpos_x":Math.floor(d.cx), "subpos_y":Math.floor(d.cy), 
+                  "capital":Math.floor(d.capitalization), "earnings":Math.floor(d.earnings), "taxes":Math.floor(d.taxes), 
+                  "tax_rate":d.tax_rate * 100, "sector":d.sector, "tax_rate_bin":Math.floor(d.tax_rate_bin * 100)
                   })
             })
             nested_data = d3.nest()
@@ -88,13 +81,19 @@
          /******/
 
          /*********************************************/
-
          main_svg.append("svg:line")
              .attr("class", "x_line")
              .attr("x1", svg_margin)
              .attr("y1", function() { return (main_chart_trans_y + chart_height) / 2; })
              .attr("x2", 1200)
              .attr("y2", function() { return (main_chart_trans_y + chart_height) / 2; });
+
+         main_svg.append("svg:line")
+            .attr("x1",svg_margin)
+            .attr("y1", function() { return subchart_1_trans_y + (chart_height / 2); })
+            .attr("x2",1200)
+            .attr("y2", function() { return subchart_1_trans_y + (chart_height / 2); })
+            .attr("class", "x_line");
 
          var flattened_data_w_pos = [];
          var full_data_flatten;
@@ -103,19 +102,17 @@
          full_tick_fn.set_obj_id("n_circle").set_data_id(flattened_data_w_pos)
 
          var full_data_cluster_fn;         
+         
          var full_cluster_force = d3.layout.force()
-
          setTimeout(full_data_flatten, 3500);
          setTimeout(function() {
             full_data_cluster_fn = apply_cluster_force_algo("n_circle", flattened_data_w_pos, full_tick_fn, full_cluster_force)
          }, 3750)
          setTimeout(full_data_cluster_fn, 4000);
-         
 
-         var subchart_1_trans_y = 250;
          var filt_data;
          setTimeout(function(g) {
-            var filt_data = d3.nest()
+            filt_data = d3.nest()
                .key(function(d) { return d.tax_rate_bin; })
                .entries(company_data.filter(function(d) { return d.sector == "Information technology"; }));
             max_binheight = 100;
@@ -136,13 +133,6 @@
             }
          }, 5500);
 
-         main_svg.append("svg:line")
-            .attr("x1",svg_margin)
-            .attr("y1", function() { return subchart_1_trans_y + (chart_height / 2); })
-            .attr("x2",1200)
-            .attr("y2", function() { return subchart_1_trans_y + (chart_height / 2); })
-            .attr("class", "x_line");
-         
          var filt_flattened_data_w_pos = [];
          var filt_data_flatten = flatten_placed_bubbles("f_circle", filt_flattened_data_w_pos, subchart_1_trans_y)
          
@@ -155,8 +145,7 @@
          setTimeout(filt_data_flatten, 6500);
          setTimeout(function() {            
             filt_data_cluster_fn = apply_cluster_force_algo("f_circle", filt_flattened_data_w_pos, filt_tick_fn, filt_cluster_force)
-         }, 7250);
-         
+         }, 7250);         
          setTimeout(filt_data_cluster_fn, 7500);
 
          var filt_clustered_pos = [];
@@ -173,12 +162,15 @@
                .attr("cx", function(d) { return d.x; })
                .attr("cy", function(d) { return d.y; })
             
+
+         }, 15000);
+         setTimeout(function(g) {
+            console.log("try now")
             d3.selectAll(".n_circle")
                .on("mouseover", function() { d3.select(this).attr("stroke", "black"); })
-               .on("mouseout", function() { d3.select(this).attr("stroke", "white") });
-         }, 15000);
-
-
+               .on("mouseout", function() { d3.select(this).attr("stroke", "white"); });
+         }, 18000);
+         // stroke: white;
          function flatten_placed_bubbles(out_circle_id, dataset_id, y_displace) {
             function flatten_placed_bubbles() {
                d3.selectAll(".by_tick_circle").data().forEach(function(d, i) {
@@ -211,7 +203,6 @@
                .on("tick", tick_fn)
                .start();
          }
-
       </script>
    </body>
 </html>
