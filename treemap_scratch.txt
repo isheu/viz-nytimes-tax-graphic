@@ -100,4 +100,42 @@
          }, 7500);
          */
 
+               /*var filt_data;            
+               console.log(sectors[i])
+               setTimeout(function(g) {
+                  filt_data = d3.nest()
+                     .key(function(d) { return d.tax_rate_bin; })
+                     .entries(company_data.filter(function(d) { return d.sector == sectors[i]; }));
+                  max_binheight = 100;
+                  ndata_tot_size = [], max_tot_size = 0, ndata_binheight = [];
+
+                  for (var i = 0; i < filt_data.length; i++) {
+                     ndata_tot_size[i] = 0;
+                     nested_data[i].values.forEach(function(d) { ndata_tot_size[i] += d.capital })
+                     if (ndata_tot_size[i] > max_tot_size) { max_tot_size = ndata_tot_size[i]; }
+                  }
+                  for (var i = 0; i < filt_data.length; i++) {
+                     ndata_binheight[i] = max_binheight * (Math.sqrt(ndata_tot_size[i]) / Math.sqrt(max_tot_size))
+                  }
+                  var line_ticks = []
+                  for (var i = 0; i < filt_data.length; i++) {         
+                     line_ticks[i] = sgm_on_line(binwidth, ndata_binheight[i], filt_data[i].values[0].tax_rate_bin, filt_data[i], subchart_1_trans_y);
+                     line_ticks[i]()
+                  }
+               }, 5500);
+
+               var filt_flattened_data_w_pos = [];
+               var filt_data_flatten = flatten_placed_bubbles("f_circle", filt_flattened_data_w_pos, subchart_1_trans_y)
+               
+               var filt_tick_fn = cluster_tick_fn()
+               filt_tick_fn.set_obj_id("f_circle").set_data_id(filt_flattened_data_w_pos)
+
+               var filt_data_cluster_fn;
+               var filt_cluster_force = d3.layout.force()
+               
+               setTimeout(filt_data_flatten, 6500);
+               setTimeout(function() {            
+                  filt_data_cluster_fn = apply_cluster_force_algo("f_circle", filt_flattened_data_w_pos, filt_tick_fn, filt_cluster_force)
+               }, 7250);         
+               setTimeout(filt_data_cluster_fn, 7500); */
 

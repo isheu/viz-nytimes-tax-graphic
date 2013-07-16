@@ -31,6 +31,7 @@
       <div id = "tooltip"></div>
       <div id="body"></div>
       <script type="text/javascript">         
+         var sectors = ["Industrials", "Health care", "Retailers", "Information technology", "Insurance", "Pharma", "Utilities", "Materials", "Consumer products", "Financials", "Energy", "Telecom"]
          var svg_height = 400;
 
          // Chart-level Attributes: sets the bin width, y-location, for the final bubble-axis-aligned graph.
@@ -42,10 +43,10 @@
          var svg_margin = 10;
 
          var main_chart_trans_y = 0;
-         var subchart_1_trans_y = 250;
+         var subchart_1_trans_y = 100;
 
          var main_svg = d3.select("body").append("svg:svg").attr("id", "main")
-            .attr("width", 1200).attr("height", 800);
+            .attr("width", 1600).attr("height", 1800);
 
          /******/
          var company_data = [], nested_data;
@@ -85,15 +86,8 @@
              .attr("class", "x_line")
              .attr("x1", svg_margin)
              .attr("y1", function() { return (main_chart_trans_y + chart_height) / 2; })
-             .attr("x2", 1200)
+             .attr("x2", 1600)
              .attr("y2", function() { return (main_chart_trans_y + chart_height) / 2; });
-
-         main_svg.append("svg:line")
-            .attr("x1",svg_margin)
-            .attr("y1", function() { return subchart_1_trans_y + (chart_height / 2); })
-            .attr("x2",1200)
-            .attr("y2", function() { return subchart_1_trans_y + (chart_height / 2); })
-            .attr("class", "x_line");
 
          var flattened_data_w_pos = [];
          var full_data_flatten;
@@ -110,99 +104,33 @@
          }, 3750)
          setTimeout(full_data_cluster_fn, 4000);
 
-         var filt_data;
-         setTimeout(function(g) {
-            filt_data = d3.nest()
-               .key(function(d) { return d.tax_rate_bin; })
-               .entries(company_data.filter(function(d) { return d.sector == "Information technology"; }));
-            max_binheight = 100;
-            ndata_tot_size = [], max_tot_size = 0, ndata_binheight = [];
+         setTimeout(iterate_filts, 5000);
+         function iterate_filts() {
+            for(j = 0; j < sectors.length; j++) {
+               main_svg.append("svg:line")
+                  .attr("x1",svg_margin)
+                  .attr("y1", function() { return (j + 1) * subchart_1_trans_y + (chart_height / 2); })
+                  .attr("x2",1600)
+                  .attr("y2", function() { return (j + 1) * subchart_1_trans_y + (chart_height / 2); })
+                  .attr("class", "x_line");
 
-            for (var i = 0; i < filt_data.length; i++) {
-               ndata_tot_size[i] = 0;
-               nested_data[i].values.forEach(function(d) { ndata_tot_size[i] += d.capital })
-               if (ndata_tot_size[i] > max_tot_size) { max_tot_size = ndata_tot_size[i]; }
+               var filt_sector_data = pack_filtered_data()
+               filt_sector_data.set_sector(sectors[j])
+               filt_sector_data.set_index(j + 1)
+               setTimeout(filt_sector_data, j * 5000)
             }
-            for (var i = 0; i < filt_data.length; i++) {
-               ndata_binheight[i] = max_binheight * (Math.sqrt(ndata_tot_size[i]) / Math.sqrt(max_tot_size))
-            }
-            var line_ticks = []
-            for (var i = 0; i < filt_data.length; i++) {         
-               line_ticks[i] = sgm_on_line(binwidth, ndata_binheight[i], filt_data[i].values[0].tax_rate_bin, filt_data[i], subchart_1_trans_y);
-               line_ticks[i]()
-            }
-         }, 5500);
-
-         var filt_flattened_data_w_pos = [];
-         var filt_data_flatten = flatten_placed_bubbles("f_circle", filt_flattened_data_w_pos, subchart_1_trans_y)
-         
-         var filt_tick_fn = cluster_tick_fn()
-         filt_tick_fn.set_obj_id("f_circle").set_data_id(filt_flattened_data_w_pos)
-
-         var filt_data_cluster_fn;
-         var filt_cluster_force = d3.layout.force()
-         
-         setTimeout(filt_data_flatten, 6500);
-         setTimeout(function() {            
-            filt_data_cluster_fn = apply_cluster_force_algo("f_circle", filt_flattened_data_w_pos, filt_tick_fn, filt_cluster_force)
-         }, 7250);         
-         setTimeout(filt_data_cluster_fn, 7500);
-
-         var filt_clustered_pos = [];
-         setTimeout(function(g) {
-            d3.selectAll(".f_circle").data().forEach(function(d, i) { 
-                     filt_clustered_pos[i] = {"radius": d.radius, "x": d.x, "y": d.y, "t_value": d.t_value, "name": d.name, "sector": d.sector, "tax_rate": d.tax_rate}
-                  });         
-            d3.selectAll(".f_circle").remove()
-            d3.selectAll(".n_circle")
-               .data(filt_clustered_pos, function(d) { return d.name; })
-               .attr("id", function(d) { return d.name })
-               .transition().duration(1200)
-               .delay(function(d, i) { return (d.tax_rate / 100) * 1200; })
-               .attr("cx", function(d) { return d.x; })
-               .attr("cy", function(d) { return d.y; })
-            
-
-         }, 15000);
-         setTimeout(function(g) {
-            console.log("try now")
-            d3.selectAll(".n_circle")
-               .on("mouseover", function() { d3.select(this).attr("stroke", "black"); })
-               .on("mouseout", function() { d3.select(this).attr("stroke", "white"); });
-         }, 18000);
-         // stroke: white;
-         function flatten_placed_bubbles(out_circle_id, dataset_id, y_displace) {
-            function flatten_placed_bubbles() {
-               d3.selectAll(".by_tick_circle").data().forEach(function(d, i) {
-                     dataset_id[i] =  {
-                        "radius": d.radius, 
-                        "x": d.x + (d.t_value / 2) * (binwidth + svg_margin), 
-                        "y": d.y + main_chart_trans_y + y_displace + (svg_height - d.theight) / 2, 
-                        "t_value": d.t_value, 
-                        "name": d.name, 
-                        "sector": d.sector, 
-                        "tax_rate": d.tax_rate}
-                     });
-               d3.selectAll("div.tick").remove()
-               main_svg.selectAll("." + out_circle_id)
-                  .data(dataset_id, function(d) { return d.name; })
-                  .enter().append("circle")
-                  .attr("class", out_circle_id).attr("id", function(d) { return d.name; })
-                  .attr("fill", function(d) { return "rgba(96,96,96," + 0.35 * ((d.t_value / 2) % 2 + 1) + ")" ; })
-                  .attr("cx", function(d, i) { return d.x; })
-                  .attr("cy", function(d) { return d.y; })
-                  .attr("r", function(d) { return d.radius; });
-            }
-            return flatten_placed_bubbles;
          }
-
-         function apply_cluster_force_algo(obj_id, dataset, tick_fn, force_layout) {
-            force_layout
-               .nodes(dataset).size([800, 600])
-               .gravity(0).friction(0.1).charge(1)
-               .on("tick", tick_fn)
-               .start();
-         }
+         
+         d3.select("body").append("button").on("click", function() {
+            d3.selectAll(".n_circle").data().forEach(function(d, i) {
+               console.log(d.name + "|" + d.capital + "|" + d.tax_rate + "|" + d.sector + "|" + d.radius + "|" + d.x + "|" + d.y)
+            });
+            for(j = 0; j < sectors.length; j++) {
+               d3.selectAll(".f_circle_" + j).data().forEach(function(d, i) {
+                  console.log(d.name + "|" + d.capital + "|" + d.tax_rate + "|" + d.sector + "|" + d.radius + "|" + d.x + "|" + d.y)
+               });
+            }
+         })         
       </script>
    </body>
 </html>

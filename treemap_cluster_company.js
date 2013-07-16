@@ -1,17 +1,92 @@
 // Create programmatic "resistance" but not barrier if a circle crosses its bin
 // Can I modify the treemap layout to randomize/alternative large squares?
 // what are those DOM exceptions?
+function pack_filtered_data() {
+   var sel_sector;
+   var index;
+   var subchart_trans_y;
+   function filter_and_pack() {
+      var filt_data;
+      filt_data = d3.nest()
+         .key(function(d) { return d.tax_rate_bin; })
+         .entries(company_data.filter(function(d) { return d.sector == sel_sector; }));
+      max_binheight = 100;
+      ndata_tot_size = [], max_tot_size = 0, ndata_binheight = [];
 
-function tooltip(ttip_data, height, width) {
-   var content_height = height;
-   var content_width = width;
-   // Generalizable tooltip
-   function draw_tooltip() {
-      d3.select("#tooltip")
-         .data(ttip_data)
-         .enter().append("li");
+      for (var i = 0; i < filt_data.length; i++) {
+         ndata_tot_size[i] = 0;
+         nested_data[i].values.forEach(function(d) { ndata_tot_size[i] += d.capital })
+         if (ndata_tot_size[i] > max_tot_size) { max_tot_size = ndata_tot_size[i]; }
       }
-   return draw_tooltip
+      for (var i = 0; i < filt_data.length; i++) {
+         ndata_binheight[i] = max_binheight * (Math.sqrt(ndata_tot_size[i]) / Math.sqrt(max_tot_size))
+      }
+      var line_ticks = []
+      for (var i = 0; i < filt_data.length; i++) {         
+         line_ticks[i] = sgm_on_line(binwidth, ndata_binheight[i], filt_data[i].values[0].tax_rate_bin, filt_data[i], subchart_trans_y);
+         line_ticks[i]()
+      }
+
+      var filt_flattened_data_w_pos = [];
+      var filt_data_flatten = flatten_placed_bubbles("f_circle_" + index, filt_flattened_data_w_pos, subchart_trans_y)
+      
+      var filt_tick_fn = cluster_tick_fn()
+      filt_tick_fn.set_obj_id("f_circle_" + index).set_data_id(filt_flattened_data_w_pos)
+
+      var filt_data_cluster_fn;
+      var filt_cluster_force = d3.layout.force()
+      
+      setTimeout(filt_data_flatten, 500);
+      setTimeout(function() {            
+         filt_data_cluster_fn = apply_cluster_force_algo("f_circle_" + index, filt_flattened_data_w_pos, filt_tick_fn, filt_cluster_force)
+      }, 1250);         
+      setTimeout(filt_data_cluster_fn, 1500);
+   }
+   filter_and_pack.set_sector = function(sec) {
+      sel_sector = sec;
+      return filter_and_pack;
+   }
+   filter_and_pack.set_index = function(ix) {
+      index = ix;
+      subchart_trans_y = subchart_1_trans_y * ix;
+      return filter_and_pack;
+   }
+   return filter_and_pack;
+}
+
+function flatten_placed_bubbles(out_circle_id, dataset_id, y_displace) {
+   function flatten_placed_bubbles() {
+      d3.selectAll(".by_tick_circle").data().forEach(function(d, i) {
+            dataset_id[i] =  {
+               "radius": d.radius, 
+               "x": d.x + (d.t_value / 2) * (binwidth + svg_margin), 
+               "y": d.y + main_chart_trans_y + y_displace + (svg_height - d.theight) / 2, 
+               "t_value": d.t_value, 
+               "capital": d.capital,
+               "tax_rate_bin": d.tax_rate_bin,
+               "name": d.name, 
+               "sector": d.sector, 
+               "tax_rate": d.tax_rate}
+            });
+      d3.selectAll("div.tick").remove()
+      main_svg.selectAll("." + out_circle_id)
+         .data(dataset_id, function(d) { return d.name; })
+         .enter().append("circle")
+         .attr("class", out_circle_id).attr("id", function(d) { return d.name; })
+         .attr("fill", function(d) { return "rgba(96,96,96," + 0.35 * ((d.t_value / 2) % 2 + 1) + ")" ; })
+         .attr("cx", function(d, i) { return d.x; })
+         .attr("cy", function(d) { return d.y; })
+         .attr("r", function(d) { return d.radius; });
+   }
+   return flatten_placed_bubbles;
+}
+
+function apply_cluster_force_algo(obj_id, dataset, tick_fn, force_layout) {
+   force_layout
+      .nodes(dataset).size([800, 600])
+      .gravity(0).friction(0.1).charge(1)
+      .on("tick", tick_fn)
+      .start();
 }
 
 function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
@@ -69,11 +144,9 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
             .attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
       }
-   }
-   
+   }   
    return generate_sgm_layout
 }
-
 
 
 function cluster_tick_fn(e) {
@@ -188,4 +261,3 @@ function collide(alpha, other_data) {
     });
   };
 }
-
