@@ -19,6 +19,8 @@
       refine colliding to 'harden' boundaries between bins? bounding box "view-source:http://mbostock.github.io/d3/talk/20110921/bounding.html"
       another way to pass data from one variable to another?
 
+
+      When should I use closures? When should I not? WTF is the deal with the SetTimeout callback functions?????
       Mapping label to a color
       deal with circles that have out-of-range input, transitions
       need nested selections?
@@ -95,61 +97,20 @@
              .attr("y2", function() { return (main_chart_trans_y + chart_height) / 2; });
 
          var flattened_data_w_pos = [];
+         var full_data_flatten;
          full_data_flatten = flatten_placed_bubbles("n_circle", flattened_data_w_pos, 0)
+         var full_tick_fn = cluster_tick_fn()
+         full_tick_fn.set_obj_id("n_circle").set_data_id(flattened_data_w_pos)
 
-         var cluster_force = d3.layout.force()
-         full_data_cluster_fn = apply_cluster_force_algo()
-         full_data_cluster_fn
-            .set_dataset(flattened_data_w_pos)
-            .set_tick_fn(cluster_tick)
+         var full_data_cluster_fn;         
+         var full_cluster_force = d3.layout.force()
 
          setTimeout(full_data_flatten, 3500);
+         setTimeout(function() {
+            full_data_cluster_fn = apply_cluster_force_algo("n_circle", flattened_data_w_pos, full_tick_fn, full_cluster_force)
+         }, 3750)
          setTimeout(full_data_cluster_fn, 4000);
          
-         function flatten_placed_bubbles(out_circle_id, dataset_id, y_displace) {
-            function flatten_placed_bubbles() {
-               d3.selectAll(".by_tick_circle").data().forEach(function(d, i) {
-                     dataset_id[i] =  {
-                        "radius": d.radius, 
-                        "x": d.x + (d.t_value / 2) * (binwidth + svg_margin), 
-                        "y": d.y + main_chart_trans_y + y_displace + (svg_height - d.theight) / 2, 
-                        "t_value": d.t_value, 
-                        "name": d.name, 
-                        "sector": d.sector, 
-                        "tax_rate": d.tax_rate}
-                     });
-               d3.selectAll("div.tick").remove()
-               main_svg.selectAll("." + out_circle_id)
-                  .data(dataset_id, function(d) { return d.name; })
-                  .enter().append("circle")
-                  .attr("class", out_circle_id).attr("id", function(d) { return d.name; })
-                  .attr("fill", function(d) { return "rgba(96,96,96," + 0.35 * ((d.t_value / 2) % 2 + 1) + ")" ; })
-                  .attr("cx", function(d, i) { return d.x; })
-                  .attr("cy", function(d) { return d.y; })
-                  .attr("r", function(d) { return d.radius; });
-            }
-            return flatten_placed_bubbles;
-         }
-
-         function apply_cluster_force_algo() {
-            var dataset, tick_fn;
-            function start_cluster_algo() {
-               cluster_force
-                   .nodes(dataset).size([800, 600])
-                   .gravity(0).friction(0.1).charge(1)
-                   .on("tick", tick_fn)
-                   .start();
-            }
-            start_cluster_algo.set_dataset = function(user_dataset) {
-               dataset = user_dataset
-               return start_cluster_algo;
-            }            
-            start_cluster_algo.set_tick_fn = function(user_tick_fn) {
-               tick_fn = user_tick_fn
-               return start_cluster_algo;
-            }
-            return start_cluster_algo;
-         }
 
          var subchart_1_trans_y = 250;
          var filt_data;
@@ -183,12 +144,19 @@
             .attr("class", "x_line");
          
          var filt_flattened_data_w_pos = [];
-         filt_data_flatten = flatten_placed_bubbles("f_circle", filt_flattened_data_w_pos, subchart_1_trans_y)
-         setTimeout(filt_data_flatten, 6500);
+         var filt_data_flatten = flatten_placed_bubbles("f_circle", filt_flattened_data_w_pos, subchart_1_trans_y)
+         
+         var filt_tick_fn = cluster_tick_fn()
+         filt_tick_fn.set_obj_id("f_circle").set_data_id(filt_flattened_data_w_pos)
 
-         var cluster_force = d3.layout.force()
-         filt_data_cluster_fn = apply_cluster_force_algo()
-         filt_data_cluster_fn.set_dataset(filt_flattened_data_w_pos).set_tick_fn(cluster_sub_tick)
+         var filt_data_cluster_fn;
+         var filt_cluster_force = d3.layout.force()
+         
+         setTimeout(filt_data_flatten, 6500);
+         setTimeout(function() {            
+            filt_data_cluster_fn = apply_cluster_force_algo("f_circle", filt_flattened_data_w_pos, filt_tick_fn, filt_cluster_force)
+         }, 7250);
+         
          setTimeout(filt_data_cluster_fn, 7500);
 
          var filt_clustered_pos = [];
@@ -208,7 +176,41 @@
             d3.selectAll(".n_circle")
                .on("mouseover", function() { d3.select(this).attr("stroke", "black"); })
                .on("mouseout", function() { d3.select(this).attr("stroke", "white") });
-         }, 9000);
+         }, 15000);
+
+
+         function flatten_placed_bubbles(out_circle_id, dataset_id, y_displace) {
+            function flatten_placed_bubbles() {
+               d3.selectAll(".by_tick_circle").data().forEach(function(d, i) {
+                     dataset_id[i] =  {
+                        "radius": d.radius, 
+                        "x": d.x + (d.t_value / 2) * (binwidth + svg_margin), 
+                        "y": d.y + main_chart_trans_y + y_displace + (svg_height - d.theight) / 2, 
+                        "t_value": d.t_value, 
+                        "name": d.name, 
+                        "sector": d.sector, 
+                        "tax_rate": d.tax_rate}
+                     });
+               d3.selectAll("div.tick").remove()
+               main_svg.selectAll("." + out_circle_id)
+                  .data(dataset_id, function(d) { return d.name; })
+                  .enter().append("circle")
+                  .attr("class", out_circle_id).attr("id", function(d) { return d.name; })
+                  .attr("fill", function(d) { return "rgba(96,96,96," + 0.35 * ((d.t_value / 2) % 2 + 1) + ")" ; })
+                  .attr("cx", function(d, i) { return d.x; })
+                  .attr("cy", function(d) { return d.y; })
+                  .attr("r", function(d) { return d.radius; });
+            }
+            return flatten_placed_bubbles;
+         }
+
+         function apply_cluster_force_algo(obj_id, dataset, tick_fn, force_layout) {
+            force_layout
+               .nodes(dataset).size([800, 600])
+               .gravity(0).friction(0.1).charge(1)
+               .on("tick", tick_fn)
+               .start();
+         }
 
       </script>
    </body>

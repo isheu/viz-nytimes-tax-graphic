@@ -74,22 +74,25 @@ function sgm_on_line(twidth, theight, tvalue, dataset, translate_y) {
    return generate_sgm_layout
 }
 
-function cluster_tick(e) {
-    main_svg.selectAll(".n_circle")
-       .each(cl_cluster(1 * e.alpha * e.alpha, flattened_data_w_pos))
-       .each(collide(0.25, flattened_data_w_pos))
-       .attr("cx", function(d) { return d.x; })
-       .attr("cy", function(d) { return d.y; })
-       //.call(cluster_force.drag);
-}
-
-function cluster_sub_tick(e) {
-    main_svg.selectAll(".f_circle")
-       .each(cl_cluster(1 * e.alpha * e.alpha, filt_flattened_data_w_pos))
-       .each(collide(0.1, filt_flattened_data_w_pos))
-       .attr("cx", function(d) { return d.x; })
-       .attr("cy", function(d) { return d.y; })
-       //.call(cluster_force.drag);
+function cluster_tick_fn(e) {
+   var obj_id;
+   var data_id;
+   function update_pos(e) {
+      main_svg.selectAll("." + obj_id)
+          .each(cl_cluster(1 * e.alpha * e.alpha, data_id))
+          .each(collide(0.25, data_id))
+          .attr("cx", function(d) { return d.x; })
+          .attr("cy", function(d) { return d.y; })
+   }
+   update_pos.set_obj_id = function(in_obj_id) {
+      obj_id = in_obj_id
+      return update_pos;
+   }
+   update_pos.set_data_id = function(in_data_id) {
+      data_id = in_data_id
+      return update_pos;
+   }
+   return update_pos;
 }
 
 function cl_cluster(alpha, data) {
