@@ -1,0 +1,76 @@
+<!-- Legend, Brush, Search, Tooltip, Annotations -->
+<html>
+   <head>
+      <script type="text/javascript" src="d3.v2.js"></script>
+      <script type="text/javascript" src="../jquery-ui-1.10.3/jquery-1.9.1.js"></script>
+      <script type="text/javascript" src="company_graphic_tooltip.js"></script>
+      <link rel="stylesheet" type="text/css" href="treemap_styles.css" />
+   </head>
+   <body>
+      <div id="main"></div>
+      <script type="text/javascript">
+         var sectors = ["Industrials", "Health care", "Retailers", "Information technology", "Insurance", "Pharma", "Utilities", "Materials", "Consumer products", "Financials", "Energy", "Telecom"];
+         var chart_height = 400;
+
+         var svg_canvas = d3.select("body").append("svg:svg")
+            .attr("id", "main_svg").attr("width", 1600).attr("height", 1600);
+
+         var company_data_agg = [];
+         d3.csv("data/placed_companies_all.csv", function(dataset) {   
+            dataset.forEach(function(d) {
+               company_data_agg.push({ "name": d.name, "capital": d.capital, "tax_rate": +d.tax_rate, "sector": d.sector, 
+                    "radius": +d.radius, "x":Math.floor(d.x), "y":Math.floor(d.y) })
+            })
+            svg_canvas.selectAll("circle.aggregate")
+               .data(company_data_agg, function(d) { return d.name; })
+               .enter().append("circle")
+               .attr("class", "aggregate")
+               .attr("fill", function(d) {
+                     if (d.tax_rate <= 15) { return "rgba(0,92,92,0.6)" }
+                     else if ((d.tax_rate > 15) & (d.tax_rate <= 30)) { return "rgba(0,128,192,0.6)" }
+                     else if ((d.tax_rate > 30) & (d.tax_rate <= 45)) { return "rgba(192,128,92,0.6)" }
+                     else if ((d.tax_rate > 45) & (d.tax_rate <= 60)) { return "rgba(255,96,0,0.6)" }
+                     else if (d.tax_rate > 60) { return "rgba(92,128,128,0.6)" }
+                  })
+               .attr("id", function(d) { return d.name; })
+               .attr("cx", function(d) { return d.x; })
+               .attr("cy", function(d) { return d.y; })
+               .attr("r", function(d) { return d.radius; });
+            svg_canvas.append("svg:line")
+               .attr("class", "x_line")
+               .attr("x1", 0)
+               .attr("y1", function() { return chart_height / 2; })
+               .attr("x2", 1600)
+               .attr("y2", function() { return chart_height / 2; });
+         })
+
+         var company_data_split = [];
+         d3.csv("data/placed_companies_by_sector.csv", function(dataset) {
+            dataset.forEach(function(d) {
+               company_data_split.push({ "name": d.name, "capital": d.capital, "tax_rate": +d.tax_rate, "sector": d.sector, 
+                    "radius": +d.radius, "x":Math.floor(d.x), "y":Math.floor(d.y) })
+            })
+         })
+
+         d3.select("body").append("div")
+            .attr("id", "options")
+            .style("top", 10)
+            .style("left", 15)
+            .style("position", "absolute");
+
+         var toggle_to_data = company_data_split;
+         d3.select("div#options").append("button")
+            .on("click", function() {
+               svg_canvas.selectAll("circle.aggregate")
+                  .data(toggle_to_data, function(d) { return d.name; })
+                  .transition().duration(1200)
+                  .delay(function(d) { return (d.tax_rate / 100) * 1200; })
+                  .attr("cx", function(d) { return d.x; })
+                  .attr("cy", function(d) { return d.y; })
+               if (toggle_to_data == company_data_agg) { toggle_to_data = company_data_split; }
+               else { toggle_to_data = company_data_agg }
+            });
+
+      </script>
+   </body>
+</html>

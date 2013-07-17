@@ -99,7 +99,12 @@
          
          var full_cluster_force = d3.layout.force()
          setTimeout(full_data_flatten, 3500);
+         //var sectors;
          setTimeout(function() {
+/*
+            setTimeout(function ()
+               console.log(sectors)
+            ) */
             full_data_cluster_fn = apply_cluster_force_algo("n_circle", flattened_data_w_pos, full_tick_fn, full_cluster_force)
          }, 3750)
          setTimeout(full_data_cluster_fn, 4000);
@@ -120,7 +125,6 @@
                setTimeout(filt_sector_data, j * 5000)
             }
          }
-         
          d3.select("body").append("button").on("click", function() {
             d3.selectAll(".n_circle").data().forEach(function(d, i) {
                console.log(d.name + "|" + d.capital + "|" + d.tax_rate + "|" + d.sector + "|" + d.radius + "|" + d.x + "|" + d.y)
