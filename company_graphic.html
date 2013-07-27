@@ -2,12 +2,18 @@
 <html>
    <head>
       <script type="text/javascript" src="d3.v2.js"></script>
-      <script type="text/javascript" src="../jquery-ui-1.10.3/jquery-1.9.1.js"></script>
+      <script type="text/javascript" src="jquery-1.10.2.js"></script>      
+      <script type="text/javascript" src="jquery-ui-1.10.3\ui\jquery-ui.js"></script>
       <script type="text/javascript" src="company_graphic_tooltip.js"></script>
       <link rel="stylesheet" type="text/css" href="treemap_styles.css" />
+      <link rel="stylesheet" type="text/css" href="jquery-ui-1.10.3.custom/css/smoothness/jquery-ui-1.10.3.custom.css" />
    </head>
    <body>
       <div id="main"></div>
+      <div class="ui-widget">
+         <label for="tags">Tags: </label>
+         <input id="tags" />
+      </div>
       <script type="text/javascript">
          var sectors = ["Industrials", "Health care", "Retailers", "Information technology", "Insurance", "Pharma", "Utilities", "Materials", "Consumer products", "Financials", "Energy", "Telecom"];
          var chart_height = 400;
@@ -37,11 +43,17 @@
                .attr("cy", function(d) { return d.y; })
                .attr("r", function(d) { return d.radius; });
             svg_canvas.append("svg:line")
-               .attr("class", "x_line")
+               .attr("class", "x_line").attr("id", "x_line_agg")
                .attr("x1", 0)
                .attr("y1", function() { return chart_height / 2; })
                .attr("x2", 1600)
                .attr("y2", function() { return chart_height / 2; });
+
+            var company_name_array = [];
+            company_data_agg.forEach(function(d) { company_name_array.push(d.name) });
+            $(function() { $( "#tags" ).autocomplete({ source: company_name_array }); })         
+            //defs
+            //clippath
          })
 
          var company_data_split = [];
@@ -59,18 +71,28 @@
             .style("position", "absolute");
 
          var toggle_to_data = company_data_split;
+         var viz_state = 1; 
+         var viz_state_to = 0;
          d3.select("div#options").append("button")
             .on("click", function() {
+               svg_canvas.select("#x_line_agg")
+                  .attr("opacity", viz_state).transition().duration(1200)
+                  .attr("opacity", viz_state_to);
                svg_canvas.selectAll("circle.aggregate")
                   .data(toggle_to_data, function(d) { return d.name; })
                   .transition().duration(1200)
                   .delay(function(d) { return (d.tax_rate / 100) * 1200; })
                   .attr("cx", function(d) { return d.x; })
                   .attr("cy", function(d) { return d.y; })
-               if (toggle_to_data == company_data_agg) { toggle_to_data = company_data_split; }
-               else { toggle_to_data = company_data_agg }
+               if (toggle_to_data == company_data_agg) { 
+                     toggle_to_data = company_data_split
+                     viz_state = 1
+                     viz_state_to = 0; }
+               else { 
+                     toggle_to_data = company_data_agg 
+                     viz_state = 0
+                     viz_state_to = 1; }
             });
-
       </script>
    </body>
 </html>

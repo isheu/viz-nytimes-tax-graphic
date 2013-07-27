@@ -18,8 +18,7 @@
       label? 
       refine colliding to 'harden' boundaries between bins? bounding box "view-source:http://mbostock.github.io/d3/talk/20110921/bounding.html"
       another way to pass data from one variable to another?
-
-
+      
       When should I use closures? When should I not? WTF is the deal with the SetTimeout callback functions????? Called functions vs. pointers to functions
       Why is it taking longer for the force layout to converge?????
       Mapping label to a color
@@ -121,7 +120,7 @@
 
                var filt_sector_data = pack_filtered_data()
                filt_sector_data.set_sector(sectors[j])
-               filt_sector_data.set_index(j + 1)
+               filt_sector_data.set_index(j)
                setTimeout(filt_sector_data, j * 5000)
             }
          }

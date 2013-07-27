@@ -48,7 +48,7 @@ function pack_filtered_data() {
    }
    filter_and_pack.set_index = function(ix) {
       index = ix;
-      subchart_trans_y = subchart_1_trans_y * ix;
+      subchart_trans_y = subchart_1_trans_y * (ix + 1);
       return filter_and_pack;
    }
    return filter_and_pack;

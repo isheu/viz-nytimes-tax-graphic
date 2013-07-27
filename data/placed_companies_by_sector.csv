@@ -20,9 +20,9 @@ FedEx Corporation,30182,23,Industrials,5.906808952,390,297
 United Technologies Corp.,86050,24,Industrials,9.973655298,418,312
 Cummins Inc.,21408,24,Industrials,4.974700795,429,300
 L-3 Communications Holdings Inc.,7381,24,Industrials,2.921033379,411,289
-PACCAR Inc.,17049,24,Industrials,4.439441857,414,297
+PACCAR Inc.,17049,24,Industrials,4.439441857,413,297
 Parker-Hannifin Corporation,13409,24,Industrials,3.937106044,406,302
-Dover Corporation,12741,24,Industrials,3.837785299,426,290
+Dover Corporation,12741,24,Industrials,3.837785299,426,291
 Flowserve Corp.,7771,24,Industrials,2.997211371,418,290
 Xylem Inc.,5186,24,Industrials,2.448472177,406,294
 Precision Castparts Corp.,26794,26,Industrials,5.565416786,454,303
@@ -46,7 +46,7 @@ Pall Corporation,7439,34,Industrials,2.932487681,585,293
 "W.W. Grainger, Inc.",15643,35,Industrials,4.252447295,587,310
 "United Parcel Service, Inc.",78736,36,Industrials,9.54037819,620,300
 Expeditors International of Washington Inc.,7535,36,Industrials,2.951348844,609,290
-Cintas Corporation,5431,36,Industrials,2.505640836,614,279
+Cintas Corporation,5431,36,Industrials,2.505640836,614,280
 Equifax Inc.,6862,36,Industrials,2.81646445,621,279
 "Republic Services, Inc.",11781,37,Industrials,3.690370713,617,286
 Robert Half International Inc.,4993,37,Industrials,2.402479552,608,282
@@ -130,7 +130,7 @@ Xilinx Inc.,9610,7,Information technology,3.333040654,122,602
 "NetApp, Inc.",12229,7,Information technology,3.759883509,119,609
 Microchip Technology Inc.,6974,7,Information technology,2.839356265,115,603
 Corning Inc.,19663,8,Information technology,4.767643863,153,603
-Xerox Corporation,10574,10,Information technology,3.496218529,184,605
+Xerox Corporation,10574,10,Information technology,3.496218529,184,606
 "Citrix Systems, Inc.",12699,10,Information technology,3.831454554,187,613
 Lam Research Corporation,6697,11,Information technology,2.782396809,178,601
 Teradata Corporation,8798,11,Information technology,3.189120255,190,601
@@ -191,12 +191,12 @@ Principal Financial Group Inc.,9873,17,Insurance,3.378341013,278,702
 "MetLife, Inc.",39913,18,Insurance,6.792600975,321,710
 "Prudential Financial, Inc.",26071,20,Insurance,5.489815662,353,702
 Torchmark Corp.,5450,21,Insurance,2.51001992,350,694
-Loews Corporation,17171,22,Insurance,4.455297521,386,702
+Loews Corporation,17171,22,Insurance,4.455297521,387,702
 Aon plc,18735,24,Insurance,4.653779109,420,699
 AFLAC Inc.,23183,25,Insurance,5.176827986,422,712
 The Chubb Corporation,23062,25,Insurance,5.163300495,412,707
 Cincinnati Financial Corp.,7804,25,Insurance,3.003568544,408,699
-Unum Group,7075,28,Insurance,2.859842653,485,703
+Unum Group,7075,28,Insurance,2.859842653,486,703
 Progressive Corp.,15460,34,Insurance,4.227500444,581,695
 "Marsh & McLennan Companies, Inc.",20532,35,Insurance,4.871857141,586,709
 Assurant Inc.,3614,42,Insurance,2.043962818,718,704
@@ -213,8 +213,8 @@ Gilead Sciences Inc.,71932,24,Pharma,9.118848173,422,798
 Merck & Co. Inc.,137457,28,Pharma,12.60556591,490,797
 Biogen Idec Inc.,45875,32,Pharma,7.282272997,555,799
 Allergan Inc.,33550,39,Pharma,6.227664089,655,800
-Pfizer Inc.,209533,43,Pharma,15.5634234,727,795
-"Actavis, Inc.",12565,64,Pharma,3.811186167,1087,802
+Pfizer Inc.,209533,43,Pharma,15.5634234,726,795
+"Actavis, Inc.",12565,64,Pharma,3.811186167,1086,802
 "NextEra Energy, Inc.",33946,0,Utilities,6.264309699,22,904
 PG&E Corp.,19237,1,Utilities,4.715715428,13,912
 Xcel Energy Inc.,14844,1,Utilities,4.14242248,21,892
@@ -222,7 +222,7 @@ Xcel Energy Inc.,14844,1,Utilities,4.14242248,21,892
 "American Electric Power Co., Inc.",23915,2,Utilities,5.257921643,60,897
 ONEOK Inc.,10022,2,Utilities,3.403737945,48,896
 Duke Energy Corporation,51507,3,Utilities,7.716352247,51,908
-"Pepco Holdings, Inc.",5445,3,Utilities,2.508868271,43,901
+"Pepco Holdings, Inc.",5445,3,Utilities,2.508868271,43,900
 "NRG Energy, Inc.",8649,4,Utilities,3.162,89,900
 "CenterPoint Energy, Inc.",10315,4,Utilities,3.453134808,94,905
 CMS Energy Corp.,7535,4,Utilities,2.951348844,81,900
@@ -238,7 +238,7 @@ Southern Company,41267,12,Utilities,6.906855435,223,908
 FirstEnergy Corp.,18569,12,Utilities,4.633116014,210,909
 PPL Corporation,18462,12,Utilities,4.619748045,227,896
 Sempra Energy,20001,12,Utilities,4.808446319,213,919
-Edison International,16607,13,Utilities,4.381517089,217,897
+Edison International,16607,13,Utilities,4.381517089,216,897
 NiSource Inc.,9392,13,Utilities,3.295019272,208,900
 SCANA Corp.,7246,14,Utilities,2.894196953,250,897
 Northeast Utilities,13787,15,Utilities,3.992213922,252,904
@@ -260,7 +260,7 @@ The Sherwin-Williams Company,17135,22,Materials,4.450624675,382,996
 Monsanto Company,56160,24,Materials,8.057354405,418,1003
 Eastman Chemical Co.,10520,24,Materials,3.487279742,409,994
 Ecolab Inc.,23661,25,Materials,5.229925047,422,989
-Ball Corporation,7038,25,Materials,2.852354817,417,981
+Ball Corporation,7038,25,Materials,2.852354817,418,981
 International Flavors & Fragrances Inc.,6027,25,Materials,2.639547689,412,985
 Sigma-Aldrich Corporation,9129,26,Materials,3.248557218,452,1000
 PPG Industries Inc.,18777,28,Materials,4.658992595,482,993
@@ -289,7 +289,7 @@ H. J. Heinz Company,23219,17,Consumer products,5.180845877,287,1098
 "The Interpublic Group of Companies, Inc.",5526,19,Consumer products,2.527460385,317,1094
 DR Horton Inc.,7545,19,Consumer products,2.953306621,320,1109
 "Mattel, Inc.",14805,20,Consumer products,4.136977157,354,1074
-Hasbro Inc.,5568,20,Consumer products,2.537047102,342,1081
+Hasbro Inc.,5568,20,Consumer products,2.537047102,342,1080
 "Pepsico, Inc.",124140,21,Consumer products,11.97939231,352,1101
 "Yum! Brands, Inc.",30290,21,Consumer products,5.917367658,359,1084
 Omnicom Group Inc.,15543,21,Consumer products,4.23883333,340,1088
@@ -299,24 +299,24 @@ Kimberly-Clark Corporation,38468,23,Consumer products,6.668508679,386,1104
 Coca-Cola Enterprises Inc.,10155,23,Consumer products,3.426248677,390,1094
 "McCormick & Company, Incorporated",9375,23,Consumer products,3.292035844,377,1097
 Newell Rubbermaid Inc.,7234,23,Consumer products,2.89179944,379,1090
-"H&R Block, Inc.",7715,24,Consumer products,2.986392473,411,1081
-"Marriott International, Inc.",12948,24,Consumer products,3.868835484,419,1079
-Comcast Corporation,108363,25,Consumer products,11.19230218,408,1105
-DIRECTV,31807,25,Consumer products,6.063735812,419,1090
-"General Mills, Inc.",31395,25,Consumer products,6.024335648,404,1087
-Procter & Gamble Co.,215227,26,Consumer products,15.77347178,464,1112
-Time Warner Inc.,54545,26,Consumer products,7.940656144,470,1084
-V.F. Corporation,18862,26,Consumer products,4.669525886,448,1071
-"Philip Morris International, Inc.",155089,27,Consumer products,13.38965586,434,1107
-McDonald's Corp.,101783,27,Consumer products,10.84717235,451,1088
-Archer Daniels Midland Company,21951,27,Consumer products,5.037395756,461,1074
-Nike Inc.,53572,27,Consumer products,7.869512818,432,1083
-"Fossil, Inc.",5574,27,Consumer products,2.538413678,441,1077
-Kellogg Company,23301,28,Consumer products,5.189986127,490,1093
-Starbucks Corporation,43549,28,Consumer products,7.095255034,487,1106
-BorgWarner Inc.,8425,28,Consumer products,3.120785158,482,1088
-Ralph Lauren Corporation,15385,29,Consumer products,4.21723369,478,1096
-"Chipotle Mexican Grill, Inc.",10444,29,Consumer products,3.474660271,488,1083
+"H&R Block, Inc.",7715,24,Consumer products,2.986392473,408,1080
+"Marriott International, Inc.",12948,24,Consumer products,3.868835484,416,1079
+Comcast Corporation,108363,25,Consumer products,11.19230218,412,1106
+DIRECTV,31807,25,Consumer products,6.063735812,420,1089
+"General Mills, Inc.",31395,25,Consumer products,6.024335648,404,1089
+Procter & Gamble Co.,215227,26,Consumer products,15.77347178,438,1114
+Time Warner Inc.,54545,26,Consumer products,7.940656144,468,1084
+V.F. Corporation,18862,26,Consumer products,4.669525886,447,1072
+"Philip Morris International, Inc.",155089,27,Consumer products,13.38965586,468,1107
+McDonald's Corp.,101783,27,Consumer products,10.84717235,448,1089
+Archer Daniels Midland Company,21951,27,Consumer products,5.037395756,457,1075
+Nike Inc.,53572,27,Consumer products,7.869512818,429,1077
+"Fossil, Inc.",5574,27,Consumer products,2.538413678,440,1077
+Kellogg Company,23301,28,Consumer products,5.189986127,494,1092
+Starbucks Corporation,43549,28,Consumer products,7.095255034,489,1104
+BorgWarner Inc.,8425,28,Consumer products,3.120785158,479,1087
+Ralph Lauren Corporation,15385,29,Consumer products,4.21723369,482,1095
+"Chipotle Mexican Grill, Inc.",10444,29,Consumer products,3.474660271,487,1085
 Colgate-Palmolive Co.,54989,30,Consumer products,7.972909381,517,1101
 Campbell Soup Company,14197,30,Consumer products,4.051139593,518,1088
 Wyndham Worldwide Corporation,8659,30,Consumer products,3.163827429,522,1081
@@ -325,14 +325,14 @@ Lennar Corp.,7494,30,Consumer products,2.943308343,513,1082
 "Discovery Communications, Inc.",28071,31,Consumer products,5.696496818,503,1106
 Brown-Forman Corporation,15070,31,Consumer products,4.173837563,504,1095
 Mead Johnson Nutrition Company,15517,31,Consumer products,4.235286531,527,1092
-"Leggett & Platt, Incorporated",4745,31,Consumer products,2.342054654,507,1083
+"Leggett & Platt, Incorporated",4745,31,Consumer products,2.342054654,507,1084
 The Walt Disney Company,106196,32,Consumer products,11.07982744,550,1106
 Johnson Controls Inc.,22781,32,Consumer products,5.13174785,539,1092
 "Harley-Davidson, Inc.",11532,32,Consumer products,3.651163102,534,1084
 The Estée Lauder Companies Inc.,24896,32,Consumer products,5.364678555,556,1089
 Family Dollar Stores Inc.,6878,32,Consumer products,2.819746088,545,1078
 The Washington Post Company,3258,32,Consumer products,1.940682354,541,1081
-Target Corp.,44422,33,Consumer products,7.166019258,567,1098
+Target Corp.,44422,33,Consumer products,7.166019258,567,1097
 "Viacom, Inc.",32442,33,Consumer products,6.123965382,532,1102
 "Coach, Inc.",14039,33,Consumer products,4.028533728,546,1085
 "Scripps Networks Interactive, Inc.",9925,33,Consumer products,3.387226004,552,1079
@@ -442,3 +442,10 @@ Baker Hughes Incorporated,19776,44,Energy,4.781323666,754,1295
 Hess Corporation,24530,52,Energy,5.32509906,888,1294
 Marathon Oil Corporation,23252,58,Energy,5.184526208,971,1294
 ConocoPhillips,72417,74,Energy,9.149538349,1260,1290
+Sprint Nextel Corp.,18968,0,Telecom,4.682628322,19,1394
+"MetroPCS Communications, Inc.",4115,1,Telecom,2.181041036,19,1386
+Verizon Communications Inc.,141285,9,Telecom,12.77988498,154,1385
+Frontier Communications Corporation,4070,12,Telecom,2.169082755,219,1398
+Windstream Corporation,4979,14,Telecom,2.399109001,252,1398
+"CenturyLink, Inc.",22630,18,Telecom,5.114712113,320,1393
+"AT&T, Inc.",206594,26,Telecom,15.45388831,457,1383
