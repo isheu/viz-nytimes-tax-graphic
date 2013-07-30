@@ -10,7 +10,7 @@ function gen_tooltip(sngl_company_data) {
    sngl_co_array.push(sngl_company_data)
 
    d3.select("body").selectAll("div#bubble_tooltip").data(sngl_co_array).enter().append("div").attr("id", "bubble_tooltip")
-      .style("top", function(d) { return d.y - 100 - d.radius; })
+      .style("top", function(d) { return d.y - 105 - d.radius; })
       .style("left", function(d) { return d.x - 125 + d.radius; });
 
    d3.select("#bubble_tooltip").append("span").html(function(d) { return d.name; });
@@ -59,9 +59,18 @@ function gen_color_legend() {
       .attr("transform", "translate(100,500)")
 }
 
-function gen_annotation() {
-   var annotation = d3.select("body").append("div").attr("class", "annotation");
-   annotation.append("div").attr("id", "arrow_horizontal");
-   annotation.append("div").attr("id", "arrow_vertical");
-   annotation.append("div").attr("id", "annotation_content").html("About one of every seven companies had an effective tax rate lower than 10 percent, including Amazon at 6 percent and Verizon at 9 percent. Nine companies paid no taxes at all.")
+function gen_annotation(annote_id, annote_content) {
+   var annotation = d3.select("body").append("div").attr("class", "annotation").attr("id", function() { "annotation_" + annote_id; });
+   annotation.append("div").attr("id", "arrow_horizontal")
+      .style("height", 2).style("left", "10%").style("width", "80%").style("bottom", 95);
+   annotation.append("div").attr("id", "arrow_vertical")
+      .style("height", 90).style("left", "50%").style("width", "50%");
+   annotation.append("div").attr("id", "annotation_content").html(annote_content)
+   //d3.select("#annotation_" + annote_id + "#annotation_content").selectAll("b").on("mouseover", function() { console.log(d3.select(this).attr("id")); })
+   d3.selectAll("b.annote_span").on("mousemove", function() { 
+      var selected = d3.select(this).attr("id");
+      console.log(selected)
+      d3.selectAll("circle#" + selected)
+         .attr("stroke", "black");
+   })
 }

@@ -10,10 +10,11 @@ something along the lines of ipython notebook
    <head>
       <script type="text/javascript" src="d3.v2.js"></script>
       <script type="text/javascript" src="jquery-1.10.2.js"></script>      
-      <script type="text/javascript" src="jquery-ui-1.10.3\ui\jquery-ui.js"></script>
+      <script type="text/javascript" src="../libraries/jquery-ui-1.10.3\ui\jquery-ui.js"></script>
       <script type="text/javascript" src="company_graphic_tooltip.js"></script>
       <link rel="stylesheet" type="text/css" href="company_graphic.css" />
-      <link rel="stylesheet" type="text/css" href="jquery-ui-1.10.3.custom/css/pepper_grinder/jquery-ui-1.10.3.custom.css" />
+      <link rel="stylesheet" type="text/css" href="treemap_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../libraries/jquery-ui-1.10.3.custom/css/pepper_grinder/jquery-ui-1.10.3.custom.css" />
    </head>
    <body>
       <div id="main"></div>
@@ -51,7 +52,9 @@ something along the lines of ipython notebook
                      else if ((d.tax_rate > 40) & (d.tax_rate <= 50)) { return bubble_color_wheel[4].color }
                      else if (d.tax_rate > 50) { return bubble_color_wheel[5].color }
                   })
-               .attr("id", function(d) { return d.name; })
+               .attr("id", function(d) { 
+                  var nopunc_id = d.name.replace(/[^\w\s]|_/g, "").replace(/\s+/g, " ").replace(" ","")
+                  return nopunc_id; })
                .attr("cx", function(d) { return d.x; })
                .attr("cy", function(d) { return d.y; })
                .attr("r", function(d) { return d.radius; });
@@ -88,9 +91,6 @@ something along the lines of ipython notebook
                d3.select(this).attr("stroke", "white");
                remove_tooltip()
             });
-            var company_name_array = [];
-            company_data_agg.forEach(function(d) { company_name_array.push(d.name) });
-            $(function() { $( "#tags" ).autocomplete({ source: company_name_array }); })
          })
 
          var company_data_split = [];
@@ -137,7 +137,9 @@ something along the lines of ipython notebook
                      viz_state_to = 1; }
             });
          gen_color_legend()
-         gen_annotation()
+
+         var low_tax_content = "About one of every seven companies had an effective tax rate lower than 10 percent, including <b id = 'AmazoncomInc' class='annote_span'>Amazon</b> at 6 percent and <b id = 'VerizonCommunicationsInc' class='annote_span'>Verizon</b> at 9 percent. Nine companies paid no taxes at all."
+         gen_annotation(1, low_tax_content)
       </script>
    </body>
 </html>
