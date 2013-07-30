@@ -1,0 +1,14 @@
+body { 
+   margin: 0px 0px 0px 0px; 
+}
+div.searchbox {
+   position: absolute;
+   top: 25px;
+   left: 1200px;
+}
+line.x_line {
+   stroke-width: 1;
+   stroke: rgba(96,96,96,0.75);
+   shape-rendering:crispEdges;
+}
+

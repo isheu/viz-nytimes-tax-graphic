@@ -1,18 +1,19 @@
-<!-- Legend, Brush, Search, Tooltip, Annotations -->
+<!-- Legend, Brush, Search, Tooltip, Annotations 
+defs, clippath -->
 <html>
    <head>
       <script type="text/javascript" src="d3.v2.js"></script>
       <script type="text/javascript" src="jquery-1.10.2.js"></script>      
       <script type="text/javascript" src="jquery-ui-1.10.3\ui\jquery-ui.js"></script>
       <script type="text/javascript" src="company_graphic_tooltip.js"></script>
-      <link rel="stylesheet" type="text/css" href="treemap_styles.css" />
-      <link rel="stylesheet" type="text/css" href="jquery-ui-1.10.3.custom/css/smoothness/jquery-ui-1.10.3.custom.css" />
+      <link rel="stylesheet" type="text/css" href="company_graphic.css" />
+      <link rel="stylesheet" type="text/css" href="jquery-ui-1.10.3.custom/css/pepper_grinder/jquery-ui-1.10.3.custom.css" />
    </head>
    <body>
       <div id="main"></div>
-      <div class="ui-widget">
-         <label for="tags">Tags: </label>
-         <input id="tags" />
+      <div class="ui-widget searchbox">
+         <label for="tags">Search by name: </label>
+         <input id="tags" size=50 />
       </div>
       <script type="text/javascript">
          var sectors = ["Industrials", "Health care", "Retailers", "Information technology", "Insurance", "Pharma", "Utilities", "Materials", "Consumer products", "Financials", "Energy", "Telecom"];
@@ -32,7 +33,7 @@
                .enter().append("circle")
                .attr("class", "aggregate")
                .attr("fill", function(d) {
-                     if (d.tax_rate <= 15) { return "rgba(0,92,92,0.6)" }
+                  if (d.tax_rate <= 15) { return "rgba(0,92,92,0.6)" }
                      else if ((d.tax_rate > 15) & (d.tax_rate <= 30)) { return "rgba(0,128,192,0.6)" }
                      else if ((d.tax_rate > 30) & (d.tax_rate <= 45)) { return "rgba(192,128,92,0.6)" }
                      else if ((d.tax_rate > 45) & (d.tax_rate <= 60)) { return "rgba(255,96,0,0.6)" }
@@ -48,12 +49,24 @@
                .attr("y1", function() { return chart_height / 2; })
                .attr("x2", 1600)
                .attr("y2", function() { return chart_height / 2; });
-
+                     
             var company_name_array = [];
             company_data_agg.forEach(function(d) { company_name_array.push(d.name) });
-            $(function() { $( "#tags" ).autocomplete({ source: company_name_array }); })         
-            //defs
-            //clippath
+            $(function() { 
+               function split(val) { return val.split( /,\s*/ ); }
+               function extractLast(term) { return split( term ).pop(); }
+               $( "#tags" ).autocomplete({   source: function(request, response) { response( $.ui.autocomplete.filter(company_name_array, extractLast( request.term ))); },
+                                             focus: function() { return false; },
+                                             select: function(event, ui) {
+                                                var terms = split(this.value)
+                                                terms.pop()
+                                                terms.push( ui.item.value )
+                                                terms.push( "" )
+                                                this.value = terms.join( ", " )
+                                                return false;
+                                             },
+                                             change: function() { console.log($("#tags").val()) } });
+            });
          })
 
          var company_data_split = [];
@@ -74,14 +87,17 @@
          var viz_state = 1; 
          var viz_state_to = 0;
          d3.select("div#options").append("button")
+            .attr("class", "ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")
+            .style("width", 75)
+            .html("By Sector")
             .on("click", function() {
                svg_canvas.select("#x_line_agg")
-                  .attr("opacity", viz_state).transition().duration(1200)
+                  .attr("opacity", viz_state).transition().duration(900)
                   .attr("opacity", viz_state_to);
                svg_canvas.selectAll("circle.aggregate")
                   .data(toggle_to_data, function(d) { return d.name; })
-                  .transition().duration(1200)
-                  .delay(function(d) { return (d.tax_rate / 100) * 1200; })
+                  .transition().duration(900)
+                  .delay(function(d) { return (d.tax_rate / 100) * 900; })
                   .attr("cx", function(d) { return d.x; })
                   .attr("cy", function(d) { return d.y; })
                if (toggle_to_data == company_data_agg) { 
