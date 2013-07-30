@@ -1,5 +1,11 @@
-<!-- Legend, Brush, Search, Tooltip, Annotations 
-defs, clippath -->
+<!-- Legend, Brush, Search, Tooltip, Annotations
+defs, clippath 
+Efficient Use of some sort of color brewer 
+Find a company ... . real time searching...
+Time series data, a workspace connection to previous. 
+data exploration vs. an infographic
+something along the lines of ipython notebook
+-->
 <html>
    <head>
       <script type="text/javascript" src="d3.v2.js"></script>
@@ -19,13 +25,18 @@ defs, clippath -->
          var sectors = ["Industrials", "Health care", "Retailers", "Information technology", "Insurance", "Pharma", "Utilities", "Materials", "Consumer products", "Financials", "Energy", "Telecom"];
          var chart_height = 400;
 
+         var cols_ttip_display = ["capital", "tax_rate", "sector"];
+         var cols_ttip_display_name = {"capital":"Market Capitalization", "tax_rate":"Effective Tax Rate", "sector":"Sector"};
+
+         var price_formatter = d3.format(">,");
+
          var svg_canvas = d3.select("body").append("svg:svg")
             .attr("id", "main_svg").attr("width", 1600).attr("height", 1600);
 
          var company_data_agg = [];
          d3.csv("data/placed_companies_all.csv", function(dataset) {   
             dataset.forEach(function(d) {
-               company_data_agg.push({ "name": d.name, "capital": d.capital, "tax_rate": +d.tax_rate, "sector": d.sector, 
+               company_data_agg.push({ "name": d.name, "capital": +d.capital, "tax_rate": +d.tax_rate, "sector": d.sector, 
                     "radius": +d.radius, "x":Math.floor(d.x), "y":Math.floor(d.y) })
             })
             svg_canvas.selectAll("circle.aggregate")
@@ -33,11 +44,12 @@ defs, clippath -->
                .enter().append("circle")
                .attr("class", "aggregate")
                .attr("fill", function(d) {
-                  if (d.tax_rate <= 15) { return "rgba(0,92,92,0.6)" }
-                     else if ((d.tax_rate > 15) & (d.tax_rate <= 30)) { return "rgba(0,128,192,0.6)" }
-                     else if ((d.tax_rate > 30) & (d.tax_rate <= 45)) { return "rgba(192,128,92,0.6)" }
-                     else if ((d.tax_rate > 45) & (d.tax_rate <= 60)) { return "rgba(255,96,0,0.6)" }
-                     else if (d.tax_rate > 60) { return "rgba(92,128,128,0.6)" }
+               if (d.tax_rate <= 10) { return bubble_color_wheel[0].color }
+                     else if ((d.tax_rate > 10) & (d.tax_rate <= 20)) { return bubble_color_wheel[1].color }
+                     else if ((d.tax_rate > 20) & (d.tax_rate <= 30)) { return bubble_color_wheel[2].color }
+                     else if ((d.tax_rate > 30) & (d.tax_rate <= 40)) { return bubble_color_wheel[3].color }
+                     else if ((d.tax_rate > 40) & (d.tax_rate <= 50)) { return bubble_color_wheel[4].color }
+                     else if (d.tax_rate > 50) { return bubble_color_wheel[5].color }
                   })
                .attr("id", function(d) { return d.name; })
                .attr("cx", function(d) { return d.x; })
@@ -67,6 +79,18 @@ defs, clippath -->
                                              },
                                              change: function() { console.log($("#tags").val()) } });
             });
+            
+            d3.selectAll("circle.aggregate").on("mouseover", function(d) {
+               gen_tooltip(d);
+               d3.select(this).attr("stroke", "black");
+            })
+            d3.selectAll("circle.aggregate").on("mouseout", function() {
+               d3.select(this).attr("stroke", "white");
+               remove_tooltip()
+            });
+            var company_name_array = [];
+            company_data_agg.forEach(function(d) { company_name_array.push(d.name) });
+            $(function() { $( "#tags" ).autocomplete({ source: company_name_array }); })
          })
 
          var company_data_split = [];
@@ -94,6 +118,9 @@ defs, clippath -->
                svg_canvas.select("#x_line_agg")
                   .attr("opacity", viz_state).transition().duration(900)
                   .attr("opacity", viz_state_to);
+               d3.select("div.annotation")
+                  .style("opacity", viz_state).transition().duration(1200)
+                  .style("opacity", viz_state_to);                  
                svg_canvas.selectAll("circle.aggregate")
                   .data(toggle_to_data, function(d) { return d.name; })
                   .transition().duration(900)
@@ -109,6 +136,8 @@ defs, clippath -->
                      viz_state = 0
                      viz_state_to = 1; }
             });
+         gen_color_legend()
+         gen_annotation()
       </script>
    </body>
 </html>

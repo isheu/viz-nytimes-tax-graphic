@@ -138,4 +138,11 @@
                   filt_data_cluster_fn = apply_cluster_force_algo("f_circle", filt_flattened_data_w_pos, filt_tick_fn, filt_cluster_force)
                }, 7250);         
                setTimeout(filt_data_cluster_fn, 7500); */
+/*
+bubble_color_wheel = [  { "value": 0, "color": "rgba(0,92,92,0.6)" }, 
+                        { "value": 15, "color": "rgba(0,128,192,0.6)" }, 
+                        { "value": 30, "color": "rgba(192,128,92,0.6)" }, 
+                        { "value": 45, "color": "rgba(255,96,0,0.6)" }, 
+                        { "value": 60, "color": "rgba(92,128,128,0.6)" }];
+*/
 
