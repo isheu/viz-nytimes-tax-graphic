@@ -53,7 +53,7 @@ something along the lines of ipython notebook
                      else if (d.tax_rate > 50) { return bubble_color_wheel[5].color }
                   })
                .attr("id", function(d) { 
-                  var nopunc_id = d.name.replace(/[^\w\s]|_/g, "").replace(/\s+/g, " ").replace(" ","")
+                  var nopunc_id = d.name.replace(/[^\w\s]|_/g, "").replace(/\s+/g, " ").replace(" ","").replace(" ","").replace(" ","")
                   return nopunc_id; })
                .attr("cx", function(d) { return d.x; })
                .attr("cy", function(d) { return d.y; })

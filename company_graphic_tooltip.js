@@ -66,11 +66,14 @@ function gen_annotation(annote_id, annote_content) {
    annotation.append("div").attr("id", "arrow_vertical")
       .style("height", 90).style("left", "50%").style("width", "50%");
    annotation.append("div").attr("id", "annotation_content").html(annote_content)
-   //d3.select("#annotation_" + annote_id + "#annotation_content").selectAll("b").on("mouseover", function() { console.log(d3.select(this).attr("id")); })
-   d3.selectAll("b.annote_span").on("mousemove", function() { 
+   d3.selectAll("b.annote_span").on("mouseover", function() { 
       var selected = d3.select(this).attr("id");
-      console.log(selected)
-      d3.selectAll("circle#" + selected)
-         .attr("stroke", "black");
+      d3.selectAll("circle#" + selected).attr("stroke", "black");
+      gen_tooltip(d3.selectAll("circle#" + selected).data()[0]);
+   })
+   d3.selectAll("b.annote_span").on("mouseout", function() { 
+      var selected = d3.select(this).attr("id");
+      d3.selectAll("circle#" + selected).attr("stroke", "white");
+      remove_tooltip();
    })
 }
