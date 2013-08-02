@@ -9,6 +9,7 @@ function gen_tooltip(sngl_company_data) {
    var sngl_co_array = []
    sngl_co_array.push(sngl_company_data)
 
+   if (ttip_on == 1) { remove_tooltip(); }
    d3.select("body").selectAll("div#bubble_tooltip").data(sngl_co_array).enter().append("div").attr("id", "bubble_tooltip")
       .style("top", function(d) { return d.y - 105 - d.radius; })
       .style("left", function(d) { return d.x - 125 + d.radius; });

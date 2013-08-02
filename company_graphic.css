@@ -65,3 +65,6 @@ div#arrow_vertical {
    border-width: 1px;
    border-color: black;
 }
+.searching {
+   opacity: 0.5;
+}
