@@ -9,7 +9,29 @@
       <div id = "main"></div>
 
       <script type="text/javascript">
-         var hcp_select = [{"code":"83925", "description":"Opiates"}, {"code":"82542", "description":"Column Chromatography"}, {"code":"83789", "description":"Mass Spectrometry"}];
+         var hcp_select = [
+            {"code":"83925", "description":"Opiates", "tot_array":[{"tot_util_2010":80000000}, {"tot_util_2011":90000000}, {"tot_util_2012":70000000}, {"tot_util_2013":12000000}], "mue_array":[{"mue_util_2010":12}, {"mue_util_2011":21}, {"mue_util_2012":17}, {"mue_util_2013":20}]}, 
+            {"code":"82542", "description":"Column Chromatography", "tot_array":[{"tot_util_2010":23000000}, {"tot_util_2011":34000000}, {"tot_util_2012":12000000}, {"tot_util_2013":1000000}], "mue_array":[{"mue_util_2010":11}, {"mue_util_2011":13}, {"mue_util_2012":19}, {"mue_util_2010":25}]}, 
+            {"code":"83789", "description":"Mass Spectrometry", "tot_array":[{"tot_util_2010":54000000}, {"tot_util_2011":29000000}, {"tot_util_2012":42000000}, {"tot_util_2013":3200000}], "mue_array":[{"mue_util_2010":14}, {"mue_util_2011":19}, {"mue_util_2012":25}, {"mue_util_2010":29}]}
+            ];
+
+         var hcp_npi_concentration = [
+            {"code":"83925", "top_x":1, "npi":"0111111111", "p_excess_cost":25, "p_excess_benes":30, "c_excess_cost":25, "c_excess_benes":30},
+            {"code":"83925", "top_x":2, "npi":"0222222222", "p_excess_cost":22, "p_excess_benes":24, "c_excess_cost":47, "c_excess_benes":54},
+            {"code":"83925", "top_x":3, "npi":"0333333333", "p_excess_cost":12, "p_excess_benes":10, "c_excess_cost":59, "c_excess_benes":64},
+            {"code":"83925", "top_x":4, "npi":"0444444444", "p_excess_cost":10, "p_excess_benes":9, "c_excess_cost":69, "c_excess_benes":73},
+            {"code":"83925", "top_x":5, "npi":"0555555555", "p_excess_cost":9, "p_excess_benes":8, "c_excess_cost":78, "c_excess_benes":81},
+            {"code":"82542", "top_x":1, "npi":"0011111111", "p_excess_cost":43, "p_excess_benes":51, "c_excess_cost":43, "c_excess_benes":51},
+            {"code":"82542", "top_x":2, "npi":"0022222222", "p_excess_cost":21, "p_excess_benes":11, "c_excess_cost":64, "c_excess_benes":62},
+            {"code":"82542", "top_x":3, "npi":"0033333333", "p_excess_cost":11, "p_excess_benes":10, "c_excess_cost":75, "c_excess_benes":72},
+            {"code":"82542", "top_x":4, "npi":"0044444444", "p_excess_cost":10.5, "p_excess_benes":9.5, "c_excess_cost":85.5, "c_excess_benes":81.5},
+            {"code":"82542", "top_x":5, "npi":"0055555555", "p_excess_cost":7, "p_excess_benes":9, "c_excess_cost":92.5, "c_excess_benes":90.5},
+            {"code":"83789", "top_x":1, "npi":"1111111111", "p_excess_cost":60, "p_excess_benes":70, "c_excess_cost":60, "c_excess_benes":70},
+            {"code":"83789", "top_x":2, "npi":"2222222222", "p_excess_cost":15, "p_excess_benes":17, "c_excess_cost":75, "c_excess_benes":87},
+            {"code":"83789", "top_x":3, "npi":"3333333333", "p_excess_cost":10, "p_excess_benes":9, "c_excess_cost":85, "c_excess_benes":96},
+            {"code":"83789", "top_x":4, "npi":"4444444444", "p_excess_cost":4, "p_excess_benes":2, "c_excess_cost":89, "c_excess_benes":98},
+            {"code":"83789", "top_x":5, "npi":"5555555555", "p_excess_cost":3, "p_excess_benes":1, "c_excess_cost":92, "c_excess_benes":99}];
+
          d3.select("div#hcpcs_reel").selectAll("div")
             .data(hcp_select)
             .enter().append("div")
@@ -17,35 +39,111 @@
             .attr("class", "hcpcs_bubble")
             .style("left", function(d, i) { return 10; })
             .style("top", function(d, i) { return 10 + (i * 160);});
-
          d3.selectAll(".hcpcs_bubble").append("table")
             .attr("id", "bubble_table").attr("width", "100%")
             .append("thead").append("td").attr("width", "100%").attr("height", 100).style("text-align", "center").style("vertical-align", "bottom")
             .html(function(d) { return "<h1>" + d.code + "</h1>"; });
          d3.selectAll("#bubble_table").append("tr").append("td").style("text-align", "center")
-            .html(function(d) { return d.description; });         
+            .html(function(d) { return d.description; });
 
+         d3.select("body").append("div").attr("id", "opiate_plot");
          
+         var opiate_plot = scatterplot("83925", "opiate_plot", "opiate")
+         opiate_plot()
+
+         function scatterplot(code, scatter_div_id, plot_id) {
+            var x_padding = 10;
+            var y_padding = 10;            
+            var y_plot_displace = 5;
+            var x_plot_displace = 5;
+            var width = 500;
+            var height = 150;
+            var x_domain = [0,5];
+            var y_domain = [0, 100];
+            var x_scale = d3.scale.linear()
+               .domain(x_domain)
+               .range([0, width - x_padding]);
+            var y_scale = d3.scale.linear()
+               .domain(y_domain)
+               .range([0, height - y_padding]);
+            var npi_data = hcp_npi_concentration.filter(function(d) { return d.code == code; });
+
+            function gen_scatterplot() {
+               console.log(scatter_div_id)
+               var x_axis = d3.svg.axis().scale(x_scale)
+                  .orient("bottom")
+                  .ticks(5).tickSubdivide(4).tickSize(6,3,0);
+               var y_axis = d3.svg.axis().scale(y_scale)
+                  .orient("left")
+                  .ticks(6).tickSubdivide(4).tickSize(6,3,0);
+
+               d3.select("#" + scatter_div_id).append("svg")
+                  .attr("id", function() { return "svg_" + plot_id; })
+                  .attr("width", width)
+                  .attr("height", height);
+               
+               d3.select("#svg_" + plot_id)
+                  .append("g")
+                  .attr("id", function() { return plot_id + "_scatter_pane"; }); 
+
+               d3.selectAll("#" + plot_id + "_scatter_pane")
+                  .append("rect")
+                  .attr("fill", "#E7E3DB")
+                  .attr("x", 0)
+                  .attr("y", 0)
+                  .attr("height", 500)
+                  .attr("width", 600);
+
+               d3.select("#svg_" + plot_id)
+                  .append("g").attr("class", "x axis")
+                  .append("line").attr("id", "axis")
+                  .attr("x1", function() { return 0; })
+                  .attr("y1", 0)
+                  .attr("x2", function() { return width - x_padding; })
+                  .attr("y2", 0)
+               d3.select("#svg_" + plot_id + " .x.axis")
+                  .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_plot_displace + height - y_padding) + ")"})
+                  .call(x_axis);
+               d3.select("#svg_" + plot_id)
+                  .append("g").attr("class", "y axis")
+                  .append("line").attr("id", "axis")
+                  .attr("x1", 0)
+                  .attr("y1", 0)
+                  .attr("x2", 0)
+                  .attr("y2", function() { return height - y_padding; })
+               d3.select("#svg_" + plot_id + " .y.axis")
+                  .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_plot_displace) + ")"})
+                  .call(y_axis);
+
+               d3.select("g#" + plot_id + "_scatter_pane").selectAll("circle")
+                  .data(npi_data)
+                  .enter().append("circle")
+                  .attr("class", "npi_mue")
+                  .attr("cx", function(d) { return x_scale(d.top_x) + x_plot_displace + x_padding; })
+                  .attr("cy", function(d) { return height + y_plot_displace - y_padding - y_scale(d.c_excess_cost); })
+                  .attr("r", 2);
+            }
+            return gen_scatterplot;
+         }
+
+         /*
          function line_graph() {
             function gen_line_graph() {
             }
             return gen_line_graph;
          }
-         function stackedbar() {
+         function stackedbar(code) {
+            var select_code_data = 
             function gen_stackedbar() {
             }
             return gen_stackedbar;
-         }
-         function scatterplot() {
-            function gen_scatterplot() {
-            }
-            return gen_scatterplot;
          }
          function metric_table() {
             function gen_metric_table() {
             }
             return gen_metric_table;
          }
+         */
       </script>
    </body>
 </html>

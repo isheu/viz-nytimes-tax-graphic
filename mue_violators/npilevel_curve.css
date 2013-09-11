@@ -34,3 +34,8 @@ tr {
    /* color: #999; */
    color: rgb(230,230,230);
 }
+
+circle.npi_mue {
+   fill: #004276;
+   shape-rendering: crispEdges;
+}
