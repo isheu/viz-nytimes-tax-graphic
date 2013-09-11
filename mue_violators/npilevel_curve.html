@@ -1,0 +1,51 @@
+<html>
+   <head>
+      <script type="text/javascript" src="../d3.v2.js"></script>
+      <script type="text/javascript" src="../jquery-1.10.2.js"></script>
+      <link rel="stylesheet" type="text/css" href="./npilevel_curve.css" />
+   </head>
+   <body>
+      <div id = "hcpcs_reel"></div>
+      <div id = "main"></div>
+
+      <script type="text/javascript">
+         var hcp_select = [{"code":"83925", "description":"Opiates"}, {"code":"82542", "description":"Column Chromatography"}, {"code":"83789", "description":"Mass Spectrometry"}];
+         d3.select("div#hcpcs_reel").selectAll("div")
+            .data(hcp_select)
+            .enter().append("div")
+            .attr("id", function(d, i) { return "bubble_" + d.code; })
+            .attr("class", "hcpcs_bubble")
+            .style("left", function(d, i) { return 10; })
+            .style("top", function(d, i) { return 10 + (i * 160);});
+
+         d3.selectAll(".hcpcs_bubble").append("table")
+            .attr("id", "bubble_table").attr("width", "100%")
+            .append("thead").append("td").attr("width", "100%").attr("height", 100).style("text-align", "center").style("vertical-align", "bottom")
+            .html(function(d) { return "<h1>" + d.code + "</h1>"; });
+         d3.selectAll("#bubble_table").append("tr").append("td").style("text-align", "center")
+            .html(function(d) { return d.description; });         
+
+         
+         function line_graph() {
+            function gen_line_graph() {
+            }
+            return gen_line_graph;
+         }
+         function stackedbar() {
+            function gen_stackedbar() {
+            }
+            return gen_stackedbar;
+         }
+         function scatterplot() {
+            function gen_scatterplot() {
+            }
+            return gen_scatterplot;
+         }
+         function metric_table() {
+            function gen_metric_table() {
+            }
+            return gen_metric_table;
+         }
+      </script>
+   </body>
+</html>
