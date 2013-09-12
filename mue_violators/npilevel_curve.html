@@ -1,6 +1,8 @@
 <html>
+   <!-- toggle years button -->
+   <!-- practice using map -->
    <head>
-      <script type="text/javascript" src="../d3.v2.js"></script>
+      <script type="text/javascript" src="../d3.v3.min.js"></script>
       <script type="text/javascript" src="../jquery-1.10.2.js"></script>
       <link rel="stylesheet" type="text/css" href="./npilevel_curve.css" />
    </head>
@@ -14,6 +16,12 @@
             {"code":"82542", "description":"Column Chromatography", "tot_array":[{"tot_util_2010":23000000}, {"tot_util_2011":34000000}, {"tot_util_2012":12000000}, {"tot_util_2013":1000000}], "mue_array":[{"mue_util_2010":11}, {"mue_util_2011":13}, {"mue_util_2012":19}, {"mue_util_2010":25}]}, 
             {"code":"83789", "description":"Mass Spectrometry", "tot_array":[{"tot_util_2010":54000000}, {"tot_util_2011":29000000}, {"tot_util_2012":42000000}, {"tot_util_2013":3200000}], "mue_array":[{"mue_util_2010":14}, {"mue_util_2011":19}, {"mue_util_2012":25}, {"mue_util_2010":29}]}
             ];
+
+         var hcp_yearly = [
+            {"code":"83925", "year": 2010, "tot_util": 45783212, "excess_util": 4501173, "p_excess_util": 9.8}, 
+            {"code":"83925", "year": 2011, "tot_util": 77778801, "excess_util": 8372023, "p_excess_util": 10.8}, 
+            {"code":"83925", "year": 2012, "tot_util": 129065332, "excess_util": 15771896, "p_excess_util": 12.2}, 
+            {"code":"83925", "year": 2013, "tot_util": 94516071, "excess_util": 14480532, "p_excess_util": 15.3}];
 
          var hcp_npi_concentration = [
             {"code":"83925", "top_x":1, "npi":"0111111111", "p_excess_cost":25, "p_excess_benes":30, "c_excess_cost":25, "c_excess_benes":30},
@@ -46,20 +54,20 @@
          d3.selectAll("#bubble_table").append("tr").append("td").style("text-align", "center")
             .html(function(d) { return d.description; });
 
-         d3.select("body").append("div").attr("id", "opiate_plot");
-         
+         d3.select("body").append("div").attr("id", "opiate_plot").style("height", 160);
+         var opiate_data =[];         
          var opiate_plot = scatterplot("83925", "opiate_plot", "opiate")
          opiate_plot()
 
          function scatterplot(code, scatter_div_id, plot_id) {
-            var x_padding = 10;
+            var x_padding = 30;
             var y_padding = 10;            
             var y_plot_displace = 5;
-            var x_plot_displace = 5;
-            var width = 500;
-            var height = 150;
-            var x_domain = [0,5];
-            var y_domain = [0, 100];
+            var x_plot_displace = 10;
+            var width = 200;
+            var height = 140;
+            var x_domain = [1,15];
+            var y_domain = [100, 0];
             var x_scale = d3.scale.linear()
                .domain(x_domain)
                .range([0, width - x_padding]);
@@ -67,34 +75,42 @@
                .domain(y_domain)
                .range([0, height - y_padding]);
             var npi_data = hcp_npi_concentration.filter(function(d) { return d.code == code; });
+            
+            var y_tick_format = d3.format("<d")
 
             function gen_scatterplot() {
-               console.log(scatter_div_id)
+               opiate_data = npi_data;
                var x_axis = d3.svg.axis().scale(x_scale)
                   .orient("bottom")
-                  .ticks(5).tickSubdivide(4).tickSize(6,3,0);
+                  .ticks(10).tickSubdivide(4).tickSize(6,3,0);
+
                var y_axis = d3.svg.axis().scale(y_scale)
                   .orient("left")
-                  .ticks(6).tickSubdivide(4).tickSize(6,3,0);
+                  .ticks(6).tickSubdivide(4).tickSize(6,3,0)
+                  .tickFormat(function(d) { return y_tick_format(d) + "%"; } );
 
-               d3.select("#" + scatter_div_id).append("svg")
+               d3.select("#" + scatter_div_id).style("background-color", "#C5D0D4").style("margin-top",15).style("margin-bottom",15);
+
+               var svg = d3.select("#" + scatter_div_id).append("svg")
                   .attr("id", function() { return "svg_" + plot_id; })
-                  .attr("width", width)
-                  .attr("height", height);
+                  .attr("shape-rendering", "crispEdges")
+                  .attr("width", 800)
+                  .attr("height", 170);
                
                d3.select("#svg_" + plot_id)
                   .append("g")
-                  .attr("id", function() { return plot_id + "_scatter_pane"; }); 
+                  .attr("id", function() { return plot_id + "_scatter_pane"; })
+                  .attr("transform", function() { return "translate(200,0)"});
 
                d3.selectAll("#" + plot_id + "_scatter_pane")
                   .append("rect")
-                  .attr("fill", "#E7E3DB")
+                  .attr("fill", "rgba(255,255,255,0.55)")
                   .attr("x", 0)
                   .attr("y", 0)
-                  .attr("height", 500)
-                  .attr("width", 600);
+                  .attr("height", 400)
+                  .attr("width", 225);
 
-               d3.select("#svg_" + plot_id)
+               d3.select("#" + plot_id + "_scatter_pane")
                   .append("g").attr("class", "x axis")
                   .append("line").attr("id", "axis")
                   .attr("x1", function() { return 0; })
@@ -102,9 +118,9 @@
                   .attr("x2", function() { return width - x_padding; })
                   .attr("y2", 0)
                d3.select("#svg_" + plot_id + " .x.axis")
-                  .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_plot_displace + height - y_padding) + ")"})
+                  .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (height) + ")"})
                   .call(x_axis);
-               d3.select("#svg_" + plot_id)
+               d3.select("#" + plot_id + "_scatter_pane")
                   .append("g").attr("class", "y axis")
                   .append("line").attr("id", "axis")
                   .attr("x1", 0)
@@ -112,38 +128,185 @@
                   .attr("x2", 0)
                   .attr("y2", function() { return height - y_padding; })
                d3.select("#svg_" + plot_id + " .y.axis")
-                  .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_plot_displace) + ")"})
+                  .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_padding) + ")"})
                   .call(y_axis);
 
                d3.select("g#" + plot_id + "_scatter_pane").selectAll("circle")
                   .data(npi_data)
                   .enter().append("circle")
-                  .attr("class", "npi_mue")
+                  .attr("fill", "#004276")
+                  .attr("stroke-width", 7)
+                  .attr("stroke", "transparent")
                   .attr("cx", function(d) { return x_scale(d.top_x) + x_plot_displace + x_padding; })
-                  .attr("cy", function(d) { return height + y_plot_displace - y_padding - y_scale(d.c_excess_cost); })
+                  .attr("cy", function(d) { return y_scale(d.c_excess_cost) + y_padding ; })
                   .attr("r", 2);
+               
+               d3.select("g#" + "opiate" + "_scatter_pane").selectAll("circle")
+                  .on("mouseover", function() { 
+                     d3.select(this).attr("fill", "#cc181e"); 
+                     gen_chart_tip(d3.select(this).data()[0].npi)
+                     });
+               
+               auc_shader(5);
+               function auc_shader(top_x_value) {
+                  var top_x_data = npi_data.filter(function(d) { return (d.top_x <= top_x_value); });
+                  var scatter_line = d3.svg.area()
+                     .x(function(d) { return x_scale(d.top_x) + x_plot_displace + x_padding; })
+                     .y0(function(d) { return y_scale(0) + y_padding; })
+                     .y1(function(d) { return y_scale(d.p_excess_cost) + y_padding; })
+                     .interpolate("basis");
+
+                  d3.select("g#opiate_scatter_pane")
+                     .append("path")
+                     .attr("d", function() { return scatter_line(top_x_data); })
+                     .attr("id", "interpolate")
+                     .attr("fill", "#cc181e")
+                     .attr("opacity", 0.75)
+                     .attr("stroke", "#333");
+               }
+               
+               d3.select("#" + plot_id + "_scatter_pane").append("g").attr("id","chart_ttip");
+               function gen_chart_tip(npi_value) {
+                  var charttip_data = npi_data.filter(function(d) { return (d.npi == npi_value); });                  
+                  console.log(charttip_data)
+                  d3.select("g#chart_ttip").selectAll("line")
+                     .data(charttip_data).enter().append("line")
+                     .attr("x1", function(d) { return x_scale(d.top_x) + x_plot_displace + x_padding; })
+                     .attr("x2", function(d) { return x_scale(20) + x_plot_displace + x_padding; })
+                     .attr("y1", function(d) { return y_scale((d.c_excess_cost)/2) + y_padding; })
+                     .attr("y2", function(d) { return y_scale((d.c_excess_cost)/2) + y_padding; })
+                     .attr("stroke", "#cc181e");
+               }
             }
             return gen_scatterplot;
          }
 
-         /*
-         function line_graph() {
-            function gen_line_graph() {
-            }
-            return gen_line_graph;
-         }
-         function stackedbar(code) {
-            var select_code_data = 
+
+         d3.select("body").append("div").attr("id", "opiate_bar_plot").style("height", 160);
+         var opiate_bar_data =[];
+         var opiate_bar_plot = stackedbar("83925", "opiate_bar_plot", "opiate_bar")
+         opiate_bar_plot()
+
+         function stackedbar(code, stacked_div_id, plot_id) {
+            var x_padding = 30;
+            var y_padding = 10;            
+            var x_buffer = 15;
+            var y_plot_displace = 5;
+            var x_plot_displace = 10;
+            var width = 100;
+            var height = 140;
+            var x_domain = [2010,2013];
+            var y_domain = [100, 0];
+            var x_scale = d3.scale.linear()
+               .domain(x_domain)
+               .range([0, width - x_padding]);
+            var y_scale = d3.scale.linear()
+               .domain(y_domain)
+               .range([0, height - y_padding]);
+            
             function gen_stackedbar() {
+               var select_code_data = hcp_yearly.filter( function(d) { return d.code == code; })               
+               var x_axis = d3.svg.axis().scale(x_scale)
+                  .orient("bottom")
+                  .ticks(4).tickSubdivide(0).tickSize(6,3,0)
+                  .tickFormat(function(d) { 
+                     if (d == 2010) { return "'10"; }
+                     else if (d == 2011) { return "'11"; }
+                     else if (d == 2012) { return "'12"; }
+                     else if (d == 2013) { return "'13"; }
+                  });                   
+
+               var y_axis = d3.svg.axis().scale(y_scale)
+                  .orient("left")
+                  .ticks(6).tickSubdivide(4).tickSize(6,3,0)
+                  .tickFormat(function(d) { return d + "%"; } );
+
+               d3.select("#" + stacked_div_id).style("background-color", "#CBD8E3").style("margin-top",15).style("margin-bottom",15);
+
+               var svg = d3.select("#" + stacked_div_id).append("svg")
+                  .attr("id", function() { return "svg_" + plot_id; })
+                  .attr("shape-rendering", "crispEdges")
+                  .attr("width", 800)
+                  .attr("height", 170);
+               
+               d3.select("#svg_" + plot_id)
+                  .append("g")
+                  .attr("id", function() { return plot_id + "_stacked_pane"; })
+                  .attr("transform", function() { return "translate(200,0)"});
+
+               d3.selectAll("#" + plot_id + "_stacked_pane")
+                  .append("rect")
+                  .attr("fill", "rgba(255,255,255,0.55)")
+                  .attr("x", 0)
+                  .attr("y", 0)
+                  .attr("height", 400)
+                  .attr("width", 150);
+
+               d3.select("#" + plot_id + "_stacked_pane")
+                  .append("g").attr("class", "x axis")
+                  .append("line").attr("id", "axis")
+                  .attr("x1", function() { return -x_buffer; })
+                  .attr("y1", 0)
+                  .attr("x2", function() { return width - x_padding + 8; })
+                  .attr("y2", 0)
+               d3.select("#svg_" + plot_id + " .x.axis")
+                  .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding + x_buffer) + "," + (height) + ")"})
+                  .call(x_axis);
+               d3.select("#" + plot_id + "_stacked_pane")
+                  .append("g").attr("class", "y axis")
+                  .append("line").attr("id", "axis")
+                  .attr("x1", 0)
+                  .attr("y1", 0)
+                  .attr("x2", 0)
+                  .attr("y2", function() { return height - y_padding; })
+               d3.select("#svg_" + plot_id + " .y.axis")
+                  .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_padding) + ")"})
+                  .call(y_axis);
+
+               d3.select("g#" + plot_id + "_stacked_pane").selectAll("rect#yearly_mue")
+                  .data(select_code_data)
+                  .enter().append("rect")
+                  .attr("id", "yearly_mue")
+                  .attr("x", function(d) { return x_scale(d.year) + x_plot_displace + x_padding - 8 + x_buffer; })
+                  .attr("y", function(d) { return y_scale(d.p_excess_util) + y_padding ; })
+                  .attr("height", function(d) { return height - (y_scale(d.p_excess_util) + y_padding); })
+                  .attr("fill", "#7c152a")
+                  .attr("width", 16);
+
+               d3.select("g#" + plot_id + "_stacked_pane").selectAll("rect#yearly_non")
+                  .data(select_code_data)
+                  .enter().append("rect")
+                  .attr("id", "yearly_non")
+                  .attr("x", function(d) { return x_scale(d.year) + x_plot_displace + x_padding - 8 + x_buffer; })
+                  .attr("y", function(d) { return y_scale(100) + y_padding ; })
+                  .attr("height", function(d) { return (y_scale(d.p_excess_util)); })
+                  .attr("fill", "#e6ce9d")
+                  .attr("width", 16);
+            }
+
+            d3.select("body").append("div").attr("id", "opiate_metric_table").style("height", 160);
+            var opiate_table_data =[];
+            var opiate_table = metric_table("83925", "0111111111", "opiate_metric_table", "opiate_table")
+            opiate_table()
+            function metric_table(code, npi, mtable_div_id, plot_id) {
+               var npi_data = hcp_npi_concentration.filter(function(d) { return (d.code == code) & (d.npi == npi); });
+               function gen_metric_table() {
+                  d3.select("#" + mtable_div_id).selectAll("table#table_" + code + "_" + npi)
+                     .data(npi_data).enter()
+                     .append("table")
+                     .attr("class", "metric_table")
+                     .attr("id", function() { return "table_" + code + "_" + npi; })
+                     .append("thead").append("td")
+                  d3.select("#table_" + code + "_" + npi + " thead td")
+                     .style("border-bottom", "#cc181e")
+                     .style("border-bottom-style", "solid")
+                     .style("border-bottom-width", 1)
+                     .html(function(d) { return d.npi; });
+               }
+               return gen_metric_table;
             }
             return gen_stackedbar;
          }
-         function metric_table() {
-            function gen_metric_table() {
-            }
-            return gen_metric_table;
-         }
-         */
       </script>
    </body>
 </html>
