@@ -3,13 +3,8 @@ body {
    font-size: 11px;
 }
 
-div#hcpcs_reel {
-   position: absolute;
-   top: 10;
-   left: 20;
-   height: 170;
-   width: 120;
-   /* background-color: rgba(192,192,192,0.15); */
+div#hcpcs_reel_active {
+   background-color: rgba(192,192,192,0.15);
 }
 div.hcpcs_bubble {
    position: absolute;
@@ -25,19 +20,48 @@ div.hcpcs_bubble {
    border-radius: 10px;
 }
 
+.scatter_hover {
+   fill: #7c152a;
+}
+.scatter_click {
+   fill: #e6ce9d;
+   stroke: #cc181e;
+}
+
+div.npi_stat_table {
+   position: absolute;
+   background-color: transparent;   
+}
+
+thead td {
+   border-bottom: 1 solid #406584;
+   font-family: arial, sans-serif;
+   font-size: 12px;
+   font-weight: bold;
+}
+
+td.metric_value {
+   font-family: arial, sans-serif;
+   font-size: 12px;
+   color: #333;
+}
+
+td.metric_name {
+   font-family: arial, sans-serif;
+   font-size: 12px;
+   font-weight: bold;
+   color: #333;
+}
+
 thead h1 {
    font-family: arial, sans-serif;
    font-size: 24px;
    font-weight: bold;
-   /* color: rgb(0,133,177); */
-   /* color: #cc181e; */
-   /* color: #666; */
    color: rgb(235,235,235);
 }
 tr {
    font-family: arial, sans-serif;
    font-size: 12px;
-   /* color: #999; */
    color: rgb(230,230,230);
 }
 

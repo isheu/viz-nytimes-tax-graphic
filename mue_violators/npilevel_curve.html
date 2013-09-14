@@ -1,24 +1,25 @@
 <html>
    <!-- toggle years button -->
    <!-- practice using map -->
-   <!-- Varying years by color. checkboxes to include/exclude years -->
+   <!-- Varying years by color. 
+      legend
+      activate box
+      smart tooltip
+      checkboxes to include/exclude years -->
    <head>
       <script type="text/javascript" src="../d3.v3.min.js"></script>
       <script type="text/javascript" src="../jquery-1.10.2.js"></script>
+      <script type="text/javascript" src="./npilevel_reel_helper.js"></script>
       <link rel="stylesheet" type="text/css" href="./npilevel_curve.css" />
    </head>
    <body>
       <script type="text/javascript">
+         var price_formatter = d3.format(">,s");
+         var price_formatter_full = d3.format(",02d");
          var hcp_select = [
             {"hcpcs":"83925", "description":"Opiates", "tot_array":[{"tot_util_2010":80000000}, {"tot_util_2011":90000000}, {"tot_util_2012":70000000}, {"tot_util_2013":12000000}], "mue_array":[{"mue_util_2010":12}, {"mue_util_2011":21}, {"mue_util_2012":17}, {"mue_util_2013":20}]}, 
             {"hcpcs":"82542", "description":"Column Chromatography", "tot_array":[{"tot_util_2010":23000000}, {"tot_util_2011":34000000}, {"tot_util_2012":12000000}, {"tot_util_2013":1000000}], "mue_array":[{"mue_util_2010":11}, {"mue_util_2011":13}, {"mue_util_2012":19}, {"mue_util_2010":25}]}, 
             {"hcpcs":"83789", "description":"Mass Spectrometry", "tot_array":[{"tot_util_2010":54000000}, {"tot_util_2011":29000000}, {"tot_util_2012":42000000}, {"tot_util_2013":3200000}], "mue_array":[{"mue_util_2010":14}, {"mue_util_2011":19}, {"mue_util_2012":25}, {"mue_util_2010":29}]}];
-
-         var hcp_yearly = [
-            {"hcpcs":"83925", "year": 2010, "tot_util": 45783212, "excess_util": 4501173, "p_excess_util": 9.8},
-            {"hcpcs":"83925", "year": 2011, "tot_util": 77778801, "excess_util": 8372023, "p_excess_util": 10.8},
-            {"hcpcs":"83925", "year": 2012, "tot_util": 129065332, "excess_util": 15771896, "p_excess_util": 12.2},
-            {"hcpcs":"83925", "year": 2013, "tot_util": 94516071, "excess_util": 14480532, "p_excess_util": 15.3}];
 
          d3.select("body").append("div").attr("id", "opiate_reel").attr("class", "code_reel")
             .style("height", 160).style("background-color", "#C5D0D4").style("margin-top",15).style("margin-bottom",15);
@@ -26,6 +27,17 @@
             .style("height", 160).style("background-color", "#CBD8E3").style("margin-top",15).style("margin-bottom",15);
          d3.select("body").append("div").attr("id", "mass_spectrometry_reel").attr("class", "code_reel")
             .style("height", 160).style("background-color", "#C5D0D4").style("margin-top",15).style("margin-bottom",15);
+
+         var opiate_label = reel_label("opiate_reel", "83925")
+         opiate_label()         
+         var chromatography_label = reel_label("chromatography_reel", "82542")
+         chromatography_label()
+         var mass_spectrometry_label = reel_label("mass_spectrometry_reel", "83789")
+         mass_spectrometry_label()
+
+         d3.select("div#opiate_reel").append("svg").attr("id", "opiate_reel_svg").style("width", 1024);
+         d3.select("div#chromatography_reel").append("svg").attr("id", "chromatography_reel_svg").style("width", 1024);
+         d3.select("div#mass_spectrometry_reel").append("svg").attr("id", "mass_spectrometry_reel_svg").style("width", 1024);
 
          var hcpcs_yearly_data = [];
          d3.csv("data/year_quant_test_mue.csv", function(dataset) {
@@ -36,11 +48,18 @@
                      "yr_n_excess_npis": +d.n_npi_overpmt, "yr_n_excess_npis_90": +d.n_npi_90_pct, "yr_top_5_npi_pmt": +d.top_5_npi_pmt, "yr_top_5_npi_p_pmt": +d.pct_top_5_npi_pmt * 100
                   });
             });
-            var opiate_bar_plot = stackedbar("83925", "opiate_reel", "opiate_bar")
+            var opiate_line_plot = year_linechart("83925", "opiate_reel", "opiate_line", "opiate")
+            opiate_line_plot()
+            var chromatography_line_plot = year_linechart("82542", "chromatography_reel", "chromatography_line", "chromatography")
+            chromatography_line_plot()
+            var mass_spectrometry_line_plot = year_linechart("83789", "mass_spectrometry_reel", "mass_spectrometry_line", "mass_spectrometry")
+            mass_spectrometry_line_plot()
+            
+            var opiate_bar_plot = stackedbar("83925", "opiate_reel", "opiate_bar", "opiate")
             opiate_bar_plot()
-            var chromatography_bar_plot = stackedbar("82542", "chromatography_reel", "chromatography_bar")
+            var chromatography_bar_plot = stackedbar("82542", "chromatography_reel", "chromatography_bar", "chromatography")
             chromatography_bar_plot()
-            var mass_spectrometry_bar_plot = stackedbar("83789", "mass_spectrometry_reel", "mass_spectrometry_bar")
+            var mass_spectrometry_bar_plot = stackedbar("83789", "mass_spectrometry_reel", "mass_spectrometry_bar", "mass_spectrometry")
             mass_spectrometry_bar_plot()
          })
 
@@ -55,285 +74,13 @@
                      "cumul_excess_pmt": +d.cumul_overpmt, "cumul_p_excess_pmt": +d.pct_cumul_overpmt * 100, "cumul_excess_benes": +d.cumul_unique_benes, "cumul_p_excess_benes": +d.pct_cumul_unique_benes * 100, 
                      });
             });
-            var opiate_plot = scatterplot("83925", "opiate_reel", "opiate")
+            var opiate_plot = npi_scatterplot("83925", "opiate_reel", "opiate_npi", "opiate")
             opiate_plot()
-            var chromatography_plot = scatterplot("82542", "chromatography_reel", "chromatography")
+            var chromatography_plot = npi_scatterplot("82542", "chromatography_reel", "chromatography_npi", "chromatography")
             chromatography_plot()
-            var mass_spectrometry_plot = scatterplot("83789", "mass_spectrometry_reel", "mass_spectrometry")
+            var mass_spectrometry_plot = npi_scatterplot("83789", "mass_spectrometry_reel", "mass_spectrometry_npi", "mass_spectrometry")
             mass_spectrometry_plot()
          });
-         
-         var opiate_label = reel_label("opiate_reel", "83925")
-         opiate_label()         
-         var chromatography_label = reel_label("chromatography_reel", "82542")
-         chromatography_label()
-         var mass_spectrometry_label = reel_label("mass_spectrometry_reel", "83789")
-         mass_spectrometry_label()
-
-         function reel_label(hcpcs_div, code) {
-            function gen_reel_label() {
-               d3.select("div#" + hcpcs_div).selectAll("div#bubble_" + code)
-                  .data(hcp_select.filter(function(d) { return d.hcpcs == code; }))
-                  .enter().append("div")
-                  .attr("id", function(d, i) { return "bubble_" + code; })
-                  .attr("class", "hcpcs_bubble")
-                  .style("margin-top", 4).style("margin-bottom", 4).style("margin-left", 4);
-               d3.select("div#bubble_" + code).append("table")
-                  .attr("id", function() { return "bubble_table_" + code; })
-                  .attr("width", "100%")
-                  .append("thead").append("td").attr("width", "100%").attr("height", 100).style("text-align", "center").style("vertical-align", "bottom")
-                  .html(function(d) { return "<h1>" + d.hcpcs + "</h1>"; });
-               d3.select("#bubble_table_"  + code).append("tr").append("td").style("text-align", "center")
-                  .html(function(d) { return d.description; });
-            }
-            return gen_reel_label;
-         }
-
-         function scatterplot(hcpcs, scatter_div_id, plot_id) {
-            var x_padding = 30;
-            var y_padding = 10;            
-            var y_plot_displace = 5;
-            var x_plot_displace = 10;
-            var width = 175;
-            var height = 140;
-            var x_domain = [1,10];
-            var y_domain = [100, 0];
-            var x_scale = d3.scale.linear()
-               .domain(x_domain)
-               .range([0, width - x_padding]);
-            var y_scale = d3.scale.linear()
-               .domain(y_domain)
-               .range([0, height - y_padding]);
-            var npi_code_filt_data = hcpcs_top_npi_data.filter(function(d) { return d.hcpcs == hcpcs; });
-            
-            function gen_scatterplot() {
-               var x_axis = d3.svg.axis().scale(x_scale)
-                  .orient("bottom")
-                  .ticks(10).tickSubdivide(4).tickSize(6,3,0);
-
-               var y_axis = d3.svg.axis().scale(y_scale)
-                  .orient("left")
-                  .ticks(6).tickSubdivide(4).tickSize(6,3,0)
-                  .tickFormat(function(d) { return d + "%"; } );
-
-               var svg = d3.select("#" + scatter_div_id).append("svg")
-                  .attr("id", function() { return "svg_" + plot_id; })
-                  .attr("shape-rendering", "crispEdges")
-                  .attr("width", 225)
-                  .attr("height", 170);
-               
-               d3.select("#svg_" + plot_id)
-                  .append("g")
-                  .attr("id", function() { return plot_id + "_scatter_pane"; })
-                  .attr("transform", function() { return "translate(0,0)"});
-
-               d3.selectAll("#" + plot_id + "_scatter_pane")
-                  .append("rect")
-                  .attr("fill", "rgba(255,255,255,0.55)")
-                  .attr("x", 0)
-                  .attr("y", 0)
-                  .attr("height", 400)
-                  .attr("width", 200);
-
-               d3.select("#" + plot_id + "_scatter_pane")
-                  .append("g").attr("class", "x axis")
-                  .append("line").attr("id", "axis")
-                  .attr("x1", function() { return 0; })
-                  .attr("y1", 0)
-                  .attr("x2", function() { return width - x_padding; })
-                  .attr("y2", 0)
-               d3.select("#svg_" + plot_id + " .x.axis")
-                  .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (height) + ")"})
-                  .call(x_axis);
-               d3.select("#" + plot_id + "_scatter_pane")
-                  .append("g").attr("class", "y axis")
-                  .append("line").attr("id", "axis")
-                  .attr("x1", 0)
-                  .attr("y1", 0)
-                  .attr("x2", 0)
-                  .attr("y2", function() { return height - y_padding; })
-               d3.select("#svg_" + plot_id + " .y.axis")
-                  .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_padding) + ")"})
-                  .call(y_axis);
-
-               d3.select("g#" + plot_id + "_scatter_pane").selectAll("circle")
-                  .data(npi_code_filt_data)
-                  .enter().append("circle")
-                  .style("shape-rendering", "auto")
-                  .attr("fill", function(d) {
-                     if (d.year == 2010) { return "#406584"; }
-                     else if (d.year == 2011) { return "#407524"; }
-                     else if (d.year == 2012) { return "#808514"; }
-                     else if (d.year == 2013) { return "#401504"; }
-                  })
-                  .attr("stroke-width", 7)
-                  .attr("stroke", "transparent")
-                  .attr("cx", function(d) { return x_scale(d.top_x) + x_plot_displace + x_padding; })
-                  .attr("cy", function(d) { return y_scale(d.cumul_p_excess_pmt) + y_padding ; })
-                  .attr("r", 2);
-               
-               d3.select("g#" + "opiate" + "_scatter_pane").selectAll("circle")
-                  .on("mouseover", function() { 
-                     d3.select(this).attr("fill", "#cc181e"); 
-                     gen_chart_tip(d3.select(this).data()[0].npi)
-                     });
-               
-               /*
-               auc_shader(5);
-               function auc_shader(top_x_value) {
-                  var top_x_data = npi_code_filt_data.filter(function(d) { return (d.top_x <= top_x_value); });
-                  var scatter_line = d3.svg.area()
-                     .x(function(d) { return x_scale(d.top_x) + x_plot_displace + x_padding; })
-                     .y0(function(d) { return y_scale(0) + y_padding; })
-                     .y1(function(d) { return y_scale(d.npi_p_excess_pmt) + y_padding; })
-                     .interpolate("basis");
-
-                  d3.select("g#opiate_scatter_pane")
-                     .append("path")
-                     .attr("d", function() { return scatter_line(top_x_data); })
-                     .attr("id", "interpolate")
-                     .attr("fill", "#cc181e")
-                     .attr("opacity", 0.75)
-                     .attr("stroke", "#333");
-               }
-               */
-               
-               d3.select("#" + plot_id + "_scatter_pane").append("g").attr("id","chart_ttip");
-               function gen_chart_tip(npi_value) {
-                  var charttip_data = npi_code_filt_data.filter(function(d) { return (d.npi == npi_value); });                  
-                  console.log(charttip_data)
-                  d3.select("g#chart_ttip").selectAll("line")
-                     .data(charttip_data).enter().append("line")
-                     .attr("x1", function(d) { return x_scale(d.top_x) + x_plot_displace + x_padding; })
-                     .attr("x2", function(d) { return x_scale(20) + x_plot_displace + x_padding; })
-                     .attr("y1", function(d) { return y_scale((d.cumul_p_excess_pmt)/2) + y_padding; })
-                     .attr("y2", function(d) { return y_scale((d.cumul_p_excess_pmt)/2) + y_padding; })
-                     .attr("stroke", "#cc181e");
-               }
-
-            }
-            return gen_scatterplot;
-         }
-
-
-         function stackedbar(hcpcs, stacked_div_id, plot_id) {
-            var x_padding = 30;
-            var y_padding = 10;            
-            var x_buffer = 15;
-            var y_plot_displace = 5;
-            var x_plot_displace = 10;
-            var width = 100;
-            var height = 140;
-            var x_domain = [2010,2013];
-            var y_domain = [100, 0];
-            var x_scale = d3.scale.linear()
-               .domain(x_domain)
-               .range([0, width - x_padding]);
-            var y_scale = d3.scale.linear()
-               .domain(y_domain)
-               .range([0, height - y_padding]);
-            
-            function gen_stackedbar() {
-               var select_code_data = hcpcs_yearly_data.filter( function(d) { return d.hcpcs == hcpcs; })
-               var x_axis = d3.svg.axis().scale(x_scale)
-                  .orient("bottom")
-                  .ticks(4).tickSubdivide(0).tickSize(6,3,0)
-                  .tickFormat(function(d) { 
-                     if (d == 2010) { return "'10"; }
-                     else if (d == 2011) { return "'11"; }
-                     else if (d == 2012) { return "'12"; }
-                     else if (d == 2013) { return "'13"; }
-                  });                   
-
-               var y_axis = d3.svg.axis().scale(y_scale)
-                  .orient("left")
-                  .ticks(6).tickSubdivide(4).tickSize(6,3,0)
-                  .tickFormat(function(d) { return d + "%"; } );
-
-               var svg = d3.select("#" + stacked_div_id).append("svg")
-                  .attr("id", function() { return "svg_" + plot_id; })
-                  .attr("shape-rendering", "crispEdges")
-                  .attr("width", 385)
-                  .attr("height", 170);
-               
-               d3.select("#svg_" + plot_id)
-                  .append("g")
-                  .attr("id", function() { return plot_id + "_stacked_pane"; })
-                  .attr("transform", function() { return "translate(200,0)"});
-
-               d3.selectAll("#" + plot_id + "_stacked_pane")
-                  .append("rect")
-                  .attr("fill", "rgba(255,255,255,0.55)")
-                  .attr("x", 0)
-                  .attr("y", 0)
-                  .attr("height", 400)
-                  .attr("width", 150);
-
-               d3.select("#" + plot_id + "_stacked_pane")
-                  .append("g").attr("class", "x axis")
-                  .append("line").attr("id", "axis")
-                  .attr("x1", function() { return - x_buffer; })
-                  .attr("y1", 0)
-                  .attr("x2", function() { return width - x_padding + 8; })
-                  .attr("y2", 0)
-               d3.select("#svg_" + plot_id + " .x.axis")
-                  .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding + x_buffer) + "," + (height) + ")"})
-                  .call(x_axis);
-               d3.select("#" + plot_id + "_stacked_pane")
-                  .append("g").attr("class", "y axis")
-                  .append("line").attr("id", "axis")
-                  .attr("x1", 0)
-                  .attr("y1", 0)
-                  .attr("x2", 0)
-                  .attr("y2", function() { return height - y_padding; })
-               d3.select("#svg_" + plot_id + " .y.axis")
-                  .attr("transform", function() { return "translate(" + (x_plot_displace + x_padding) + "," + (y_padding) + ")"})
-                  .call(y_axis);
-
-               d3.select("g#" + plot_id + "_stacked_pane").selectAll("rect#yearly_mue")
-                  .data(select_code_data)
-                  .enter().append("rect")
-                  .attr("id", "yearly_mue")
-                  .attr("x", function(d) { return x_scale(d.year) + x_plot_displace + x_padding - 8 + x_buffer; })
-                  .attr("y", function(d) { return y_scale(d.yr_p_excess_pmt) + y_padding ; })
-                  .attr("height", function(d) { return height - (y_scale(d.yr_p_excess_pmt) + y_padding); })
-                  .attr("fill", "#7c152a")
-                  .attr("width", 16);
-
-               d3.select("g#" + plot_id + "_stacked_pane").selectAll("rect#yearly_non")
-                  .data(select_code_data)
-                  .enter().append("rect")
-                  .attr("id", "yearly_non")
-                  .attr("x", function(d) { return x_scale(d.year) + x_plot_displace + x_padding - 8 + x_buffer; })
-                  .attr("y", function(d) { return y_scale(100) + y_padding ; })
-                  .attr("height", function(d) { return (y_scale(d.yr_p_excess_pmt)); })
-                  .attr("fill", "#e6ce9d")
-                  .attr("width", 16);
-            }
-
-            d3.select("body").append("div").attr("id", "opiate_metric_table").style("height", 160).style("margin-left", 300);
-            var opiate_table_data =[];
-            var opiate_table = metric_table("83925", "0111111111", "opiate_metric_table", "opiate_table")
-            opiate_table()
-            function metric_table(hcpcs, npi, mtable_div_id, plot_id) {
-               var npi_data = hcpcs_top_npi_data.filter(function(d) { return (d.hcpcs == hcpcs) & (d.npi == npi); });
-               function gen_metric_table() {
-                  d3.select("#" + mtable_div_id).selectAll("table#table_" + hcpcs + "_" + npi)
-                     .data(npi_data).enter()
-                     .append("table")
-                     .attr("class", "metric_table")
-                     .attr("id", function() { return "table_" + hcpcs + "_" + npi; })
-                     .append("thead").append("td")
-                  d3.select("#table_" + hcpcs + "_" + npi + " thead td")
-                     .style("border-bottom", "#cc181e")
-                     .style("border-bottom-style", "solid")
-                     .style("border-bottom-width", 1)
-                     .html(function(d) { return d.npi; });
-               }
-               return gen_metric_table;
-            }
-            return gen_stackedbar;
-         }
       </script>
    </body>
 </html>
