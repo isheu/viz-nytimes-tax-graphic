@@ -234,6 +234,7 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
             .attr("stroke", "#333");
       }
       */
+      // More generally, a generate annotation function
 
       d3.select("g#" + plot_id + "_scatter_pane").selectAll("circle")
          .on("mouseover", function() { 
@@ -253,7 +254,7 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
                   .attr("stroke-width", 7)
                   .classed("scatter_click", 0)
                remove_chart_tip("chart_ttip_clicked");
-
+               remove_npi_stat_table();
                var store_npi = d3.select(this).data()[0].npi;
                d3.select("g#" + plot_id + "_scatter_pane").selectAll("circle").filter(function(d, i) { return (d.npi == store_npi); })
                   .attr("r", 6)
@@ -268,6 +269,7 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
                   .attr("stroke-width", 7)
                   .classed("scatter_click", 0)
                remove_chart_tip("chart_ttip_clicked");
+               remove_npi_stat_table();
             }
          });
       
@@ -290,17 +292,25 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
       function gen_npi_stat_table(npi_value) {
          var table_data = npi_code_filt_data.filter(function(d) { return (d.npi == npi_value) & (+d.year == 2013); });
          d3.select("#" + scatter_div_id).select("#" + codename + "_npi_table")
-            .style("height", 160).style("width", 400).style("left", 815)
+            .style("width", 400).style("left", 815)
             .style("top", function() {
                if (codename == "opiate") { return 15; }
                else if (codename == "chromatography") { return 192; }
                else if (codename == "mass_spectrometry") { return 365; }
-               });
+               })
+            .style("background-color", "green")
+            .style("height", "0px")
+            .transition().duration(500)
+            .style("height", "160px")
 
          d3.select("#" + codename + "_npi_table").selectAll("table#" + codename + "_npi_stats")
             .data(table_data).enter()
             .append("table").attr("id", function() { return codename + "_npi_stats"; })
             .attr("width", "100%")
+            .style("max-height", "0px")
+            .transition().duration(500)
+            .style("max-height", "160px")
+         d3.select("#" + codename + "_npi_table").selectAll("table#" + codename + "_npi_stats")
             .append("thead").append("td").attr("colspan", 2)
             .html(function(d) { return d.name; })
          
@@ -318,6 +328,11 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
             .append("td").classed("metric_value", 1)
             .html(function(d) { return d.npi_p_excess_benes; });
       }
+      function remove_npi_stat_table() {
+         d3.select("table#" + codename + "_npi_stats").remove()
+      }
+
+
 
       /*
       d3.select("#" + plot_id + "_scatter_pane").append("g").attr("id","chart_ttip");
