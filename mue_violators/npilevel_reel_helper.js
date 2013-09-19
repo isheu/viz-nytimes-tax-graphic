@@ -1,3 +1,6 @@
+// Smart Tooltip Locator
+// Animation of Annotations
+
 function reel_label(hcpcs_div, code) {
    function gen_reel_label() {
       d3.select("div#" + hcpcs_div).selectAll("div#bubble_" + code)
@@ -59,13 +62,57 @@ function year_linechart(hcpcs, line_div_id, plot_id, codename) {
          .on("mouseover", function() { d3.select(this).attr("stroke", "#999") })         
          .on("mouseout", function() { d3.select(this).attr("stroke", "transparent") })
          .on("click", function() { 
-            d3.select("#" + codename + "_bar_stacked_pane")
-               .transition().duration(500)
-               .attr("transform", function() { return "translate(500,0)"})
-            d3.select("#" + codename + "_npi_scatter_pane")
-               .transition().duration(500)
-               .attr("transform", function() { return "translate(685,0)"})
+            if (!d3.select(this).classed("ann_clicked")) {
+               d3.select(this).classed("ann_clicked", 1)
+               d3.select("#" + codename + "_bar_stacked_pane")
+                  .transition().duration(500)
+                  .attr("transform", function() { return "translate(550,0)"})
+               d3.select("#" + codename + "_npi_scatter_pane")
+                  .transition().duration(500)
+                  .attr("transform", function() { return "translate(735,0)"})
+               
+               d3.select("#" + line_div_id).append("div").attr("id", "annotation_" + codename);
+               var annotation_content = hcp_select.filter(function(d) { return d.hcpcs == hcpcs; })[0].annotation
+               var annotation = annotate_chart(codename, "annotation_" + codename, annotation_content)
+               annotation();
+            }
+            else { 
+               d3.select(this).classed("ann_clicked", 0)
+               remove_annotation("annotation_" + codename); 
+               d3.select("#" + codename + "_bar_stacked_pane")
+                  .transition().duration(500)
+                  .attr("transform", function() { return "translate(415,0)"})
+               d3.select("#" + codename + "_npi_scatter_pane")
+                  .transition().duration(500)
+                  .attr("transform", function() { return "translate(600,0)"}) 
+            }
          });
+
+      function annotate_chart(codename, ann_div_id, content) {
+         function gen_annotation() {
+            d3.select("div#" + ann_div_id)
+               .style("width", 0).style("height", 0)
+               .attr("class", "annotation")
+               .style("top", function() {
+                  if (codename == "opiate") { return 15; }
+                  else if (codename == "chromatography") { return 192; }
+                  else if (codename == "mass_spectrometry") { return 365; }
+                  })
+               .style("left", 385)
+               .transition().duration(350)
+               .style("height", 145);
+            
+            d3.select("div#" + ann_div_id)
+               .transition().duration(250).delay(350)
+               .style("width", 150);
+            setTimeout(function() {
+               d3.select("div#" + ann_div_id)
+                  .html(content);
+               }, 600)
+         }
+         return gen_annotation;
+      }
+      function remove_annotation(ann_div_id) { d3.select("div#" + ann_div_id).remove(); }
 
       d3.select("#" + plot_id + "_line_pane")
          .append("g").attr("class", "x axis")
@@ -298,28 +345,23 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
                else if (codename == "chromatography") { return 192; }
                else if (codename == "mass_spectrometry") { return 365; }
                })
-            .style("background-color", "green")
-            .style("height", "0px")
-            .transition().duration(500)
+            .style("background-color", "rgba(235,235,235,0.15)")
             .style("height", "160px")
 
          d3.select("#" + codename + "_npi_table").selectAll("table#" + codename + "_npi_stats")
             .data(table_data).enter()
             .append("table").attr("id", function() { return codename + "_npi_stats"; })
             .attr("width", "100%")
-            .style("max-height", "0px")
-            .transition().duration(500)
-            .style("max-height", "160px")
-         d3.select("#" + codename + "_npi_table").selectAll("table#" + codename + "_npi_stats")
             .append("thead").append("td").attr("colspan", 2)
-            .html(function(d) { return d.name; })
-         
+            .html(function(d) { return d.name + " <br> <span> " + d.classification + " </span>"; });
+         /*
          d3.select("#" + codename + "_npi_table").select("table#" + codename + "_npi_stats")
             .append("tr").attr("id", "row_1").append("td").classed("metric_name", 1)
             .html("Specialty: ");
          d3.select("#" + codename + "_npi_table").select("table#" + codename + "_npi_stats").select("tr#row_1")
             .append("td").classed("metric_value", 1)
             .html(function(d) { return d.classification; });
+         */
 
          d3.select("#" + codename + "_npi_table").select("table#" + codename + "_npi_stats")
             .append("tr").attr("id", "row_2").append("td").classed("metric_name", 1)
@@ -441,27 +483,3 @@ function stackedbar(hcpcs, stacked_div_id, plot_id, codename) {
    }
    return gen_stackedbar;
 }
-
-/*
-   d3.select("body").append("div").attr("id", "opiate_metric_table").style("height", 160).style("margin-left", 300);
-   var opiate_table_data =[];
-   var opiate_table = metric_table("83925", "0111111111", "opiate_metric_table", "opiate_table")
-   opiate_table()
-   function metric_table(hcpcs, npi, mtable_div_id, plot_id) {
-      var npi_data = hcpcs_top_npi_data.filter(function(d) { return (d.hcpcs == hcpcs) & (d.npi == npi); });
-      function gen_metric_table() {
-         d3.select("#" + mtable_div_id).selectAll("table#table_" + hcpcs + "_" + npi)
-            .data(npi_data).enter()
-            .append("table")
-            .attr("class", "metric_table")
-            .attr("id", function() { return "table_" + hcpcs + "_" + npi; })
-            .append("thead").append("td")
-         d3.select("#table_" + hcpcs + "_" + npi + " thead td")
-            .style("border-bottom", "#cc181e")
-            .style("border-bottom-style", "solid")
-            .style("border-bottom-width", 1)
-            .html(function(d) { return d.npi; });
-      }
-      return gen_metric_table;
-   }
-*/

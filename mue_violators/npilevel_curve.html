@@ -17,9 +17,9 @@
          var price_formatter = d3.format(">,s");
          var price_formatter_full = d3.format(",02d");
          var hcp_select = [
-            {"hcpcs":"83925", "description":"Opiates", "tot_array":[{"tot_util_2010":80000000}, {"tot_util_2011":90000000}, {"tot_util_2012":70000000}, {"tot_util_2013":12000000}], "mue_array":[{"mue_util_2010":12}, {"mue_util_2011":21}, {"mue_util_2012":17}, {"mue_util_2013":20}]}, 
-            {"hcpcs":"82542", "description":"Column Chromatography", "tot_array":[{"tot_util_2010":23000000}, {"tot_util_2011":34000000}, {"tot_util_2012":12000000}, {"tot_util_2013":1000000}], "mue_array":[{"mue_util_2010":11}, {"mue_util_2011":13}, {"mue_util_2012":19}, {"mue_util_2010":25}]}, 
-            {"hcpcs":"83789", "description":"Mass Spectrometry", "tot_array":[{"tot_util_2010":54000000}, {"tot_util_2011":29000000}, {"tot_util_2012":42000000}, {"tot_util_2013":3200000}], "mue_array":[{"mue_util_2010":14}, {"mue_util_2011":19}, {"mue_util_2012":25}, {"mue_util_2010":29}]}];
+            {"hcpcs":"83925", "description":"Opiates", "annotation": "Annual testing for opiates more than tripled between 2010 and 2012"}, 
+            {"hcpcs":"82542", "description":"Column Chromatography", "annotation": "Hi"}, 
+            {"hcpcs":"83789", "description":"Mass Spectrometry", "annotation": "Hi"}];
 
          d3.select("body").append("div").attr("id", "opiate_reel").attr("class", "code_reel")
             .style("height", 160).style("background-color", "#C5D0D4").style("margin-top",15).style("margin-bottom",15);
@@ -27,6 +27,7 @@
             .style("height", 160).style("background-color", "#CBD8E3").style("margin-top",15).style("margin-bottom",15);
          d3.select("body").append("div").attr("id", "mass_spectrometry_reel").attr("class", "code_reel")
             .style("height", 160).style("background-color", "#C5D0D4").style("margin-top",15).style("margin-bottom",15);
+
 
          var opiate_label = reel_label("opiate_reel", "83925")
          opiate_label()         
@@ -81,6 +82,32 @@
             var mass_spectrometry_plot = npi_scatterplot("83789", "mass_spectrometry_reel", "mass_spectrometry_npi", "mass_spectrometry")
             mass_spectrometry_plot()
          });
+
+         d3.select("body").append("div").attr("id", "legend_reel").attr("class", "legend_reel")
+            .style("height", 50).style("background-color", "#CBD8E3").style("margin-top",15).style("margin-bottom",15);
+         d3.select("#legend_reel").append("div").attr("id", "label_legend").attr("class", "legend_bubble").html("LEGEND");
+         d3.select("div#legend_reel").append("svg").attr("id", "legend_reel_svg").style("width", 1024);
+         d3.select("#legend_reel_svg").append("g").attr("id", "year_linechart_legend")
+
+         var g_stacked = d3.select("#legend_reel_svg").append("g").attr("id", "year_stacked_legend").attr("transform", "translate(415,0)")         
+            g_stacked.append("rect").attr("y", 3).attr("fill", "rgba(255,255,255,0.55)").attr("width", 150).attr("height", 43)
+            g_stacked.append("rect").attr("x", 5).attr("y", 8).attr("fill", "#7c152a").attr("width", 20).attr("height", 15);
+            g_stacked.append("text").attr("x", 30).attr("y", 18).attr("fill", "#333").text("MUE Violations").attr("shape-rendering", "crispEdges");
+            g_stacked.append("rect").attr("x", 5).attr("y", 26).attr("fill", "#e6ce9d").attr("width", 20).attr("height", 15);
+            g_stacked.append("text").attr("x", 30).attr("y", 38).attr("fill", "#333").text("Not in Excess").attr("shape-rendering", "crispEdges");
+
+         var g_scatter = d3.select("#legend_reel_svg").append("g").attr("id", "npi_scatter_legend").attr("transform", "translate(600,0)")
+            g_scatter.append("rect").attr("y", 3).attr("fill", "rgba(255,255,255,0.55)").attr("width", 200).attr("height", 43);
+            g_scatter.append("circle").attr("cx", 18).attr("cy", 14).attr("fill", "#406584").attr("r", 4);
+            g_scatter.append("text").attr("x", 30).attr("y", 18).attr("fill", "#333").text("2010").attr("shape-rendering", "crispEdges");
+            g_scatter.append("circle").attr("cx", 18).attr("cy", 32).attr("fill", "#407524").attr("r", 4);
+            g_scatter.append("text").attr("x", 30).attr("y", 38).attr("fill", "#333").text("2011").attr("shape-rendering", "crispEdges");
+
+            g_scatter.append("circle").attr("cx", 90).attr("cy", 14).attr("fill", "#808514").attr("r", 4);
+            g_scatter.append("text").attr("x", 102).attr("y", 18).attr("fill", "#333").text("2012").attr("shape-rendering", "crispEdges");
+            g_scatter.append("circle").attr("cx", 90).attr("cy", 32).attr("fill", "#401504").attr("r", 4);
+            g_scatter.append("text").attr("x", 102).attr("y", 38).attr("fill", "#333").text("2013").attr("shape-rendering", "crispEdges");
+
       </script>
    </body>
 </html>

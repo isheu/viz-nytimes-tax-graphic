@@ -6,6 +6,7 @@ body {
 div#hcpcs_reel_active {
    background-color: rgba(192,192,192,0.15);
 }
+
 div.hcpcs_bubble {
    position: absolute;
    height: 150;
@@ -19,6 +20,28 @@ div.hcpcs_bubble {
    border-width: 1px;
    border-radius: 10px;
 }
+/*
+div.legend_bubble p {
+   vertical-align: middle;
+}
+*/
+div.legend_bubble {
+   position: absolute;   
+   font-family: arial, sans-serif;
+   font-size: 14px;
+   font-weight: bold;
+   color: #444;
+   height: 42;
+   width: 100;
+   text-align: center;
+   line-height: 43px;
+   background-color: #D9D0D4;
+   margin-top: 3;
+   margin-left: 3;
+   border-style: solid;
+   border-color: rgba(80,50,15,0.2);
+   border-width: 1px;
+}
 
 .scatter_hover {
    fill: #7c152a;
@@ -30,7 +53,17 @@ div.hcpcs_bubble {
 
 div.npi_stat_table {
    position: absolute;
-   background-color: transparent;   
+   background-color: transparent;
+}
+
+div.annotation {
+   position: absolute;
+   background-color: rgba(192,192,192,0.3);
+   padding: 5;
+   spacing: 5;
+   border-width: 1;
+   border-style: dotted;
+   border-color: #406584;
 }
 
 thead td {
@@ -59,6 +92,14 @@ thead h1 {
    font-weight: bold;
    color: rgb(235,235,235);
 }
+
+thead span {
+   font-family: arial, sans-serif;
+   font-size: 11px;
+   font-weight: normal;
+   color: #406584;
+}
+
 tr {
    font-family: arial, sans-serif;
    font-size: 12px;
