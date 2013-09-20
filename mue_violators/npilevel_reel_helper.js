@@ -1,5 +1,6 @@
 // Smart Tooltip Locator
 // Animation of Annotations
+// Axis labels
 
 function reel_label(hcpcs_div, code) {
    function gen_reel_label() {
@@ -72,7 +73,7 @@ function year_linechart(hcpcs, line_div_id, plot_id, codename) {
                   .attr("transform", function() { return "translate(735,0)"})
                
                d3.select("#" + line_div_id).append("div").attr("id", "annotation_" + codename);
-               var annotation_content = hcp_select.filter(function(d) { return d.hcpcs == hcpcs; })[0].annotation
+               var annotation_content = hcp_select.filter(function(d) { return d.hcpcs == hcpcs; })[0].annotation_line
                var annotation = annotate_chart(codename, "annotation_" + codename, annotation_content)
                annotation();
             }
@@ -156,7 +157,7 @@ function year_linechart(hcpcs, line_div_id, plot_id, codename) {
          .attr("cy", function(d) { return y_scale(d.yr_pmt) + y_padding; })
          .attr("r", 2)
          .attr("fill", "#406584")
-         .attr("stroke-width", 5)
+         .attr("stroke-width", 7)
          .attr("stroke", "transparent");
       
       d3.select("g#" + plot_id + "_line_pane").selectAll("circle")
@@ -176,7 +177,11 @@ function year_linechart(hcpcs, line_div_id, plot_id, codename) {
             .data(charttip_data).enter().append("text")
             .style("shape-rendering", "crispEdges")
             .text(function(d) { return "$" + price_formatter_full(+d.yr_pmt.toPrecision(3)); })
-            .attr("text-anchor", "middle")
+            .attr("text-anchor", function(d) {
+               if (d.year == 2010) { return "start";}
+               else if (d.year == 2013) { return "end";}
+               else { return "middle"; }
+               })
             .attr("x", function() { return 0 + (+year_x); })
             .attr("y", function() { return (+year_y) - 6; })
             .attr("fill", "#333");
@@ -324,6 +329,14 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
       d3.select("#" + plot_id + "_scatter_pane").append("g").attr("id","chart_ttip");
       function gen_chart_tip(ttip_id, npi_value, npi_x, npi_y) {
          var charttip_data = npi_code_filt_data.filter(function(d) { return (d.npi == npi_value); });
+         d3.select("#" + plot_id + "_scatter_pane").select("g#" + ttip_id).selectAll("rect")
+            .data(charttip_data).enter().append("rect")
+            //.attr("fill", "rgba(192,192,212,0.5)").attr("height", 14)
+            .attr("fill", "url(#grad1)")
+            .attr("height", 14)
+            .attr("width", 100)
+            .attr("x", function() { return (+npi_x) - 2; })
+            .attr("y", function() { return (+npi_y) - 17; });
          d3.select("#" + plot_id + "_scatter_pane").select("g#" + ttip_id).selectAll("text")
             .data(charttip_data).enter().append("text")
             .style("shape-rendering", "crispEdges")
@@ -333,7 +346,10 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
             .attr("y", function() { return (+npi_y) - 6; })
             .attr("fill", "#333");
       }
-      function remove_chart_tip(ttip_id) { d3.select("#" + plot_id + "_scatter_pane").select("g#" + ttip_id).selectAll("text").remove(); };
+      function remove_chart_tip(ttip_id) { 
+         d3.select("#" + plot_id + "_scatter_pane").select("g#" + ttip_id).selectAll("text").remove()
+         d3.select("#" + plot_id + "_scatter_pane").select("g#" + ttip_id).selectAll("rect").remove();
+         };
 
       d3.select("#" + scatter_div_id).append("div").attr("id", function() { return codename + "_npi_table"; }).attr("class", "npi_stat_table");
       function gen_npi_stat_table(npi_value) {
