@@ -1,3 +1,8 @@
+/*
+#ffffff !important
+text shadow: 0 1px 0 rgba(60,140,156,.6)
+*/
+
 body {
    font-family: arial, sans-serif;
    font-size: 11px;
@@ -11,8 +16,6 @@ div.hcpcs_bubble {
    position: absolute;
    height: 150;
    width: 100;
-   /* background-color: rgba(80,50,15,0.1); */
-   /* background-color: rgba(0,50,150,0.5); */
    background-color: #406584;
    /* background-color: #cc181e; */
    border-style: solid;
@@ -20,13 +23,9 @@ div.hcpcs_bubble {
    border-width: 1px;
    border-radius: 10px;
 }
-/*
-div.legend_bubble p {
-   vertical-align: middle;
-}
-*/
 div.legend_bubble {
    position: absolute;   
+   background-image: url("../images/mini-hero-bg.png");
    font-family: arial, sans-serif;
    font-size: 14px;
    font-weight: bold;
@@ -50,6 +49,16 @@ div.legend_bubble {
    fill: #e6ce9d;
    stroke: #cc181e;
 }
+
+.scatter_unchecked {
+   fill: transparent;
+   pointer-events: none;
+}
+
+.unchecked {
+   text-decoration: "line-through";
+}
+
 
 div.npi_stat_table {
    position: absolute;

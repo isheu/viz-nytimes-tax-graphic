@@ -1,5 +1,4 @@
 // Smart Tooltip Locator
-// Animation of Annotations
 // Axis labels
 
 function reel_label(hcpcs_div, code) {
@@ -96,12 +95,12 @@ function year_linechart(hcpcs, line_div_id, plot_id, codename) {
                .attr("class", "annotation")
                .style("top", function() {
                   if (codename == "opiate") { return 15; }
-                  else if (codename == "chromatography") { return 192; }
+                  else if (codename == "chromatography") { return 190; }
                   else if (codename == "mass_spectrometry") { return 365; }
                   })
                .style("left", 385)
                .transition().duration(350)
-               .style("height", 145);
+               .style("height", 148);
             
             d3.select("div#" + ann_div_id)
                .transition().duration(250).delay(350)
@@ -255,11 +254,12 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
          .data(npi_code_filt_data)
          .enter().append("circle")
          .style("shape-rendering", "auto")
+         .attr("id", "scatter_pts")         
          .attr("fill", function(d) {
-            if (d.year == 2010) { return "#406584"; }
-            else if (d.year == 2011) { return "#407524"; }
-            else if (d.year == 2012) { return "#808514"; }
-            else if (d.year == 2013) { return "#401504"; }
+            if (d.year == 2010) { return "rgb(139,0,0)"; }
+            else if (d.year == 2011) { return "rgb(232,151,70)"; }
+            else if (d.year == 2012) { return "rgb(153,197,169)"; }
+            else if (d.year == 2013) { return "rgb(0,68,153)"; }
          })
          .attr("stroke-width", 7)
          .attr("stroke", "transparent")
@@ -331,7 +331,6 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
          var charttip_data = npi_code_filt_data.filter(function(d) { return (d.npi == npi_value); });
          d3.select("#" + plot_id + "_scatter_pane").select("g#" + ttip_id).selectAll("rect")
             .data(charttip_data).enter().append("rect")
-            //.attr("fill", "rgba(192,192,212,0.5)").attr("height", 14)
             .attr("fill", "url(#grad1)")
             .attr("height", 14)
             .attr("width", 100)
@@ -355,7 +354,7 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
       function gen_npi_stat_table(npi_value) {
          var table_data = npi_code_filt_data.filter(function(d) { return (d.npi == npi_value) & (+d.year == 2013); });
          d3.select("#" + scatter_div_id).select("#" + codename + "_npi_table")
-            .style("width", 400).style("left", 815)
+            .style("width", 275).style("left", 815)
             .style("top", function() {
                if (codename == "opiate") { return 15; }
                else if (codename == "chromatography") { return 192; }
@@ -370,27 +369,31 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
             .attr("width", "100%")
             .append("thead").append("td").attr("colspan", 2)
             .html(function(d) { return d.name + " <br> <span> " + d.classification + " </span>"; });
-         /*
+
          d3.select("#" + codename + "_npi_table").select("table#" + codename + "_npi_stats")
             .append("tr").attr("id", "row_1").append("td").classed("metric_name", 1)
-            .html("Specialty: ");
+            .html("Total Overpayment: ");
          d3.select("#" + codename + "_npi_table").select("table#" + codename + "_npi_stats").select("tr#row_1")
             .append("td").classed("metric_value", 1)
-            .html(function(d) { return d.classification; });
-         */
+            .html(function(d) { return "$" + price_formatter_full(d.npi_excess_pmt); });
 
          d3.select("#" + codename + "_npi_table").select("table#" + codename + "_npi_stats")
             .append("tr").attr("id", "row_2").append("td").classed("metric_name", 1)
-            .html("% of Excess Benes: ");
+            .html("% of Code Overpayment: ");
          d3.select("#" + codename + "_npi_table").select("table#" + codename + "_npi_stats").select("tr#row_2")
             .append("td").classed("metric_value", 1)
-            .html(function(d) { return d.npi_p_excess_benes; });
+            .html(function(d) { return d.npi_p_excess_pmt.toPrecision(2) + "%"; });
+
+         d3.select("#" + codename + "_npi_table").select("table#" + codename + "_npi_stats")
+            .append("tr").attr("id", "row_3").append("td").classed("metric_name", 1)
+            .html("% of Excess Benes: ");
+         d3.select("#" + codename + "_npi_table").select("table#" + codename + "_npi_stats").select("tr#row_3")
+            .append("td").classed("metric_value", 1)
+            .html(function(d) { return d.npi_p_excess_benes.toPrecision(2) + "%"; });
       }
       function remove_npi_stat_table() {
          d3.select("table#" + codename + "_npi_stats").remove()
       }
-
-
 
       /*
       d3.select("#" + plot_id + "_scatter_pane").append("g").attr("id","chart_ttip");
