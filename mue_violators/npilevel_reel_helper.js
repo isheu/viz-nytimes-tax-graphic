@@ -1,6 +1,62 @@
 // Smart Tooltip Locator
 // Axis labels
+/*
+Helvetica Neue, Helvetica, Arial, sans-serif
+• Data analysis is at least as important as visually displaying it; there are tools that help with this process (Ch. 6)
+Helvetica, Arial, sans-serif
+Arial, Helvetica, sans-serif
+"Lucida Sans Unicode", "Lucida Grande", sans-serif
+Tahoma, Geneva, sans-serif
+"Courier New", Courier, monospace
+"Palatino Linotype", "Book Antiqua", Palatino, serif
+"Times New Roman", Times, serif
+Lucida Sans Unicode.
+Use inkscape to fix up the bubbles
+jqueryui
+MDN orange; #de5d0a
+YouTube Channel Borders (Blue)
+header
+border-color #1b7fcc
+background #1b7fcc
 
+border 1px solid #5f8fbf
+border-top 1px solid #6f9fcf
+background #6898c9
+
+another blue #2793e6
+
+bright blue:
+#00daee
+#00daee
+#11defa
+
+bright orange:
+#f5b232
+
+New Yorker Footer area
+Heading: #000
+Arial,Helvetica,sans-serif
+font-size: 10px
+
+#999
+9px Verdana,Geneva,sans-serif
+
+Subheading: #626262
+9px Verdana,Geneva,sans-serif
+
+NYTIMES 
+a:visited #666699
+a: #004276
+#333
+border color: #d3d3d3
+1px solid #ccc
+#e6eff8
+
+rgb(230, 239, 248)
+
+pointillism pattern.
+
+*/
 function reel_label(hcpcs_div, code) {
    function gen_reel_label() {
       d3.select("div#" + hcpcs_div).selectAll("div#bubble_" + code)
@@ -353,6 +409,10 @@ function npi_scatterplot(hcpcs, scatter_div_id, plot_id, codename) {
       d3.select("#" + scatter_div_id).append("div").attr("id", function() { return codename + "_npi_table"; }).attr("class", "npi_stat_table");
       function gen_npi_stat_table(npi_value) {
          var table_data = npi_code_filt_data.filter(function(d) { return (d.npi == npi_value) & (+d.year == 2013); });
+         /*
+         d3.select("#" + scatter_div_id)
+            .style("box-shadow", "0 4px 8px rgba(0,0,0,0.2)");
+         */
          d3.select("#" + scatter_div_id).select("#" + codename + "_npi_table")
             .style("width", 275).style("left", 815)
             .style("top", function() {
