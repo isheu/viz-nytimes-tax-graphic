@@ -52,12 +52,14 @@ Arial,Helvetica,sans-serif
       smart tooltip
       checkboxes to include/exclude years -->
    <head>
-      <script type="text/javascript" src="../d3.v3.min.js"></script>
-      <script type="text/javascript" src="../jquery-1.10.2.js"></script>
-      <script type="text/javascript" src="../../libraries/chroma.js-master/chroma.min.js"></script>
+      <script type="text/javascript" src="./d3.v3.min.js"></script>
+      <script type="text/javascript" src="./jquery-1.10.2.js"></script>
       <script type="text/javascript" src="./npilevel_reel_helper.js"></script>
       <script type="text/javascript" src="./drug_test_mue_data.js"></script>
       <link rel="stylesheet" type="text/css" href="./npilevel_curve.css" />
+      <title>
+      Quantitative Drug Testing MUE Violations over Time
+      </title>
    </head>
    <body>
 
@@ -80,15 +82,55 @@ Arial,Helvetica,sans-serif
          var percent_formatter = d3.format("2d");
          var hcp_select = [
             {"hcpcs":"83925", "description":"Opiates", "annotation_line": "Annual testing for opiates tripled from 2010 to 2012"}, 
-            {"hcpcs":"82542", "description":"Column Chromatography", "annotation_line": "Hi"}, 
-            {"hcpcs":"83789", "description":"Mass Spectrometry", "annotation_line": "Hi"}];
+            {"hcpcs":"82542", "description":"Column Chromatography", "annotation_line": "Annual testing using column chromatography more than doubled from 2010 to 2012"}, 
+            {"hcpcs":"83789", "description":"Mass Spectrometry", "annotation_line": "Annual testing using mass spectrometry increased by over 8X from 2010 to 2012"}];
+
+         d3.select("body").append("div").attr("id", "headline").attr("class", "headline")
+            .style("background-color", "transparent").style("height",12).style("margin-top",0).style("margin-bottom",5)
+            .style("font-size", 12).style("text-transform", "uppercase")
+            .html("Utilization and MUE Violations of Codes 83925, 82542, and 83780");
+
+         d3.select("body").append("div").attr("id", "title_reel").attr("class", "title_reel")
+            .style("height", 25)
+            .style("background-color", "transparent")
+            //.style("border-bottom", "1 #5f8fbf solid")
+            //.style("background-color", "#CBD8E3")
+            .style("margin-top",0).style("margin-bottom",0);
+
+
+         var title_svg = d3.select("div#title_reel").append("svg").attr("id", "title_reel_svg").style("width", "100%");
+         title_svg
+            .append("rect").attr("width", "100%").attr("height",25)
+            .attr("fill", "url(#grad2)");
+         title_svg
+            .append("text").text("Total Cost for HCPCS, Annual")
+            .style("shape-rendering", "crispEdges")
+            .attr("font-family", "Arial").attr("font-weight", "normal").attr("fill", "#444")
+            //.style("text-shadow","0 1px 0 rgba(60,140,156,1)")
+            .attr("font-size", 12)
+            .attr("x", 190).attr("y", 18);
+         title_svg
+            .append("text").text("% of Cost Exceeding MUE, Annual")
+            .style("shape-rendering", "crispEdges")
+            .attr("font-family", "Arial").attr("font-weight", "normal").attr("fill", "#444")
+            .attr("font-size", 12)
+            .attr("x", 395).attr("y", 18);
+
+         title_svg
+            .append("text").text("% of Overpayment Billed by Top X NPIs")
+            .style("shape-rendering", "crispEdges")
+            .attr("font-family", "Arial").attr("font-weight", "normal").attr("fill", "#444")
+            .attr("font-size", 12)
+            .attr("x", 605).attr("y", 18);
+
+
 
          d3.select("body").append("div").attr("id", "opiate_reel").attr("class", "code_reel")
-            .style("height", 180).style("background-color", "#C5D0D4").style("margin-top",15).style("margin-bottom",15);
+            .style("height", 200).style("background-color", "#C5D0D4").style("margin-top",1).style("margin-bottom",15);
          d3.select("body").append("div").attr("id", "chromatography_reel").attr("class", "code_reel")
-            .style("height", 180).style("background-color", "#CBD8E3").style("margin-top",15).style("margin-bottom",15);
+            .style("height", 200).style("background-color", "#CBD8E3").style("margin-top",15).style("margin-bottom",15);
          d3.select("body").append("div").attr("id", "mass_spectrometry_reel").attr("class", "code_reel")
-            .style("height", 180).style("background-color", "#C5D0D4").style("margin-top",15).style("margin-bottom",15);
+            .style("height", 200).style("background-color", "#C5D0D4").style("margin-top",15).style("margin-bottom",15);
 
 
          var opiate_label = reel_label("opiate_reel", "83925")
@@ -101,7 +143,6 @@ Arial,Helvetica,sans-serif
          d3.select("div#opiate_reel").append("svg").attr("id", "opiate_reel_svg").style("width", 1024);
          d3.select("div#chromatography_reel").append("svg").attr("id", "chromatography_reel_svg").style("width", 1024);
          d3.select("div#mass_spectrometry_reel").append("svg").attr("id", "mass_spectrometry_reel_svg").style("width", 1024);
-         
          
          
          var opiate_line_plot = year_linechart("83925", "opiate_reel", "opiate_line", "opiate")
@@ -186,19 +227,20 @@ Arial,Helvetica,sans-serif
             g_stacked.append("text").attr("x", 30).attr("y", 39).attr("fill", "#333").text("Not in Excess").attr("shape-rendering", "crispEdges");
 
          var g_scatter = d3.select("#legend_reel_svg").append("g").attr("id", "npi_scatter_legend").attr("transform", "translate(600,0)")
-            g_scatter.append("rect").attr("y", 3).attr("fill", "rgba(255,255,255,0.55)").attr("width", 200).attr("height", 43);
+            g_scatter.append("rect").attr("y", 3).attr("fill", "rgba(255,255,255,0.55)").attr("width", 225).attr("height", 43);
 
-            g_scatter.append("circle").attr("cx", 28).attr("cy", 15).attr("fill", "rgb(139,0,0)").attr("r", 4).attr("data-series", "2010");
-            g_scatter.append("text").attr("x", 40).attr("y", 19).attr("fill", "#333").text("2010").attr("shape-rendering", "crispEdges").attr("data-series", "2010");
-            g_scatter.append("circle").attr("cx", 28).attr("cy", 33).attr("fill", "rgb(232,151,70)").attr("r", 4).attr("data-series", "2011");
-            g_scatter.append("text").attr("x", 40).attr("y", 39).attr("fill", "#333").text("2011").attr("shape-rendering", "crispEdges").attr("data-series", "2011");
+            g_scatter.append("circle").attr("cx", 48).attr("cy", 15).attr("fill", "rgb(139,0,0)").attr("r", 4).attr("data-series", "2010");
+            g_scatter.append("text").attr("x", 60).attr("y", 19).attr("fill", "#333").text("2010").attr("shape-rendering", "crispEdges").attr("data-series", "2010");
+            g_scatter.append("circle").attr("cx", 48).attr("cy", 33).attr("fill", "rgb(232,151,70)").attr("r", 4).attr("data-series", "2011");
+            g_scatter.append("text").attr("x", 60).attr("y", 39).attr("fill", "#333").text("2011").attr("shape-rendering", "crispEdges").attr("data-series", "2011");
 
-            g_scatter.append("circle").attr("cx", 100).attr("cy", 15).attr("fill", "rgb(153,197,169)").attr("r", 4).attr("data-series", "2012");
-            g_scatter.append("text").attr("x", 112).attr("y", 19).attr("fill", "#333").text("2012").attr("shape-rendering", "crispEdges").attr("data-series", "2012");
-            g_scatter.append("circle").attr("cx", 100).attr("cy", 33).attr("fill", "rgb(0,68,153)").attr("r", 4).attr("data-series", "2013");
-            g_scatter.append("text").attr("x", 112).attr("y", 39).attr("fill", "#333").text("2013").attr("shape-rendering", "crispEdges").attr("data-series", "2013");
+            g_scatter.append("circle").attr("cx", 120).attr("cy", 15).attr("fill", "rgb(153,197,169)").attr("r", 4).attr("data-series", "2012");
+            g_scatter.append("text").attr("x", 132).attr("y", 19).attr("fill", "#333").text("2012").attr("shape-rendering", "crispEdges").attr("data-series", "2012");
+            g_scatter.append("circle").attr("cx", 120).attr("cy", 33).attr("fill", "rgb(0,68,153)").attr("r", 4).attr("data-series", "2013");
+            g_scatter.append("text").attr("x", 132).attr("y", 39).attr("fill", "#333").text("2013").attr("shape-rendering", "crispEdges").attr("data-series", "2013");
 
          g_scatter.selectAll("text")
+            .on("mousemove", function() { d3.select(this).style("cursor", "hand"); })
             .on("click", function() {
                var yr = d3.select(this).attr("data-series");
                if (!d3.select(this).classed("unchecked")) {
@@ -215,6 +257,51 @@ Arial,Helvetica,sans-serif
                }               
             });
 
+         d3.selectAll("circle#scatter_pts").filter(function(d) { return (+d.year != 2013); })
+            .classed("scatter_unchecked", 1);
+         g_scatter.selectAll("text").filter(function() { return (d3.select(this).attr("data-series") != 2013); })
+            .classed("unchecked", 1)
+            .attr("text-decoration", "line-through");
+         
+         d3.select("#legend_reel_svg").append("rect")
+            .attr("fill", "url(#grad1)")
+            .attr("width", 135).attr("height", 5)            
+            .attr("x", 775).attr("y", 20);
+
+         d3.select("#legend_reel_svg").append("text")
+            .style("shape-rendering", "crispEdges").attr("fill", "#444")
+            .text("<-- click year to display/hide data series from plot")
+            .attr("id","legend_instructions")
+            .attr("x", 775).attr("y", 20);
+
+
+
+         /*
+         line_interp("83925", 2010);
+         function line_interp(hcpcs_id, year_id) {
+            var year_top_x_data = npi_code_filt_data.filter(function(d) { return (d.year == year_id) & (d.hcpcs == hcpcs_id); });
+            var scatter_line = d3.svg.line()
+               .x(function(d) { return x_scale(d.top_x) + x_plot_displace + x_padding; })
+               .y(function(d) { return y_scale(d.cumul_p_excess_pmt) + y_padding; })
+               .interpolate("basis");
+
+            d3.select("g#opiate_npi_scatter_pane")
+               .append("path")
+               .style("shape-rendering", "auto")
+               .attr("d", function() { return scatter_line(year_top_x_data); })
+               .attr("id", "interpolate")
+               .attr("fill", "transparent")
+               .attr("stroke-dasharray","2,2")
+               .attr("opacity", 0.1)
+               .attr("stroke-width", 2)
+               .attr("stroke", function() {
+                  if (year_id == 2010) { return "rgb(139,0,0)"; }
+                  else if (year_id == 2011) { return "rgb(232,151,70)"; }
+                  else if (year_id == 2012) { return "rgb(153,197,169)"; }
+                  else if (year_id == 2013) { return "rgb(0,68,153)"; }
+               });
+         }
+         */
       </script>
       <svg height = "0px" width = "0px">
         <defs>
@@ -222,6 +309,11 @@ Arial,Helvetica,sans-serif
             <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:0.75" />
             <stop offset="100%" style="stop-color:rgb(255,255,255);stop-opacity:0" />
           </linearGradient>
+
+          <linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color: #CBD8E3; stop-opacity:0.25" />
+            <stop offset="100%" style="stop-color: #C5D0D4; stop-opacity:1" />
+          </linearGradient>          
         </defs>
       </svg>      
    </body>
