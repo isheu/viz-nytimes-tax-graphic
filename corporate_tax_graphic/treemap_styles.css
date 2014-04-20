@@ -45,7 +45,7 @@ table#ttip_table {
 .annotation {
    position: absolute;
    top: 300px;
-   left: 100px;
+   left: 145px;
    width: 200px;
    height: 150px;
 }
@@ -65,4 +65,9 @@ div#arrow_vertical {
    border-right-style: dotted;
    border-width: 1px;
    border-color: black;
+}
+#by_sector_button {
+   position: absolute; 
+   top: 6px;
+   left: 145px;
 }

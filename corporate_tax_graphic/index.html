@@ -1,0 +1,87 @@
+<html>
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="chrome=1">
+      <title></title>
+      
+      <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+       
+      <script type="text/javascript" src="../../libraries/iconic/js/iconic.min.js"></script>
+      <script type="text/javascript" src="./company_graphic_fn.js"></script>
+      <script type="text/javascript" src="./company_graphic_tooltip.js"></script>
+      <script type="text/javascript" src="./company_graphic_tutorial.js"></script>
+      
+      <link rel="stylesheet" href="stylesheets/styles.css">
+      <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+      
+      <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+      <link rel="stylesheet" type="text/css" href="./company_graphic.css" />
+      <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" />
+   </head>
+   <body>
+      <div class = "wrapper">
+         <header>
+            <div class = "header_content">
+               <h1>NY Times Corporate Tax Graphic Study</h1>
+               <br class="view"><a href="http://isheu.github.io">Home &#187;</a>
+               <br class="view"><a href="https://github.com/isheu/d3_Sandbox/tree/master/corporate_tax_graphic">GitHub Repo &#187;</a>
+               <p class = "view"></p>
+               <h4>Background</h4>
+               <p> One of my favorite graphics in 2013 was this NY Times visualization of corporate tax rates. Besides being a really striking presentation of the data, I thought it struck a great balance between showing the patterns concisely and allowing some room for the reader to explore. 
+
+               </p>
+               <h4 class = "view">Thoughts about Project </h4>
+               <p> I added in a few features, and tweaked the design </p>
+               <ul class = "view">
+                  <li class = "links view">Positioning bubbles along 2 dimensions and a number line</li>
+                  <li class = "links view">Treemap layout</li>
+                  <li class = "links view">Searchbox</li>
+               </ul>
+            </div>
+            <div class = "close_content">
+               <span class = "close_right">&#171;</span>            
+            </div>
+
+         </header>
+         <section>
+            <div id = "draw_area">
+               <div id="main"></div>
+               <div class="ui-widget searchbox">
+                  <label for="tags">Search by name: </label>
+                  <input id="tags" size=50 />
+               </div>
+            </div>
+         </section>
+      </div>
+
+      <script>
+         var svg_canvas;
+         var autocompleting_array, selection_made, ttip_on, company_data_agg, selected_company;
+
+         var price_formatter = d3.format(">,");
+
+         draw_tax_bubble_graphic("draw_area")
+
+         d3.select(".close_right")
+            .on("click", toggle_description)
+
+         function toggle_description() {
+            if (!d3.select(".header_content").classed("hidden")) {
+               d3.select("header").transition()
+                  .style("width", "10px")
+               d3.select(".header_content").classed("hidden", 1)
+               d3.select(".close_right").html("&#187;")
+            }
+            else {
+               d3.select("header").transition()
+                  .style("width", "350px")
+               setTimeout(function() { d3.select(".header_content").classed("hidden", 0) }, 250)
+               d3.select(".close_right").html("&#171;")
+            }
+         }
+      </script>
+   </body>
+</html>
